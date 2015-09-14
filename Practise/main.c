@@ -17,6 +17,7 @@ GLuint return_shader(GLchar const *shader_source, GLenum shader_type);
 struct vertex
 {
 	GLfloat position[NUM_AXES];
+	GLfloat color[NUM_AXES];
 };
 
 int main(int argc, char *argv[])
@@ -36,6 +37,9 @@ int main(int argc, char *argv[])
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	printf("Using opengl version %s.\n", glGetString(GL_VERSION));
+	printf("Using glsl version %s.\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
 	/*GLuint comp_shader = return_shader("Shaders/compute_shader.glsl", GL_COMPUTE_SHADER);
 
 	GLuint compute_prog = glCreateProgram();
@@ -51,8 +55,8 @@ int main(int argc, char *argv[])
 	
 	GLuint render_prog = glCreateProgram();
 	glAttachShader(render_prog, vert_shader);
-	//glAttachShader(render_prog, tess_cont_shader);
-	//glAttachShader(render_prog, tess_eval_shader);
+	glAttachShader(render_prog, tess_cont_shader);
+	glAttachShader(render_prog, tess_eval_shader);
 	glAttachShader(render_prog, geom_shader);
 	glAttachShader(render_prog, frag_shader);
 	glLinkProgram(render_prog);
@@ -76,6 +80,10 @@ int main(int argc, char *argv[])
 	tri_vertices[0].position[0] = -0.5f; tri_vertices[0].position[1] = -0.5f; tri_vertices[0].position[2] = +0.0f; tri_vertices[0].position[3] = +1.0f;
 	tri_vertices[1].position[0] = +0.5f; tri_vertices[1].position[1] = -0.5f; tri_vertices[1].position[2] = +0.0f; tri_vertices[1].position[3] = +1.0f;
 	tri_vertices[2].position[0] = +0.0f; tri_vertices[2].position[1] = +0.5f; tri_vertices[2].position[2] = +0.0f; tri_vertices[2].position[3] = +1.0f;
+
+	tri_vertices[0].color[0] = +1.0f; tri_vertices[0].color[1] = +0.0f; tri_vertices[0].color[2] = +0.0f; tri_vertices[0].color[3] = +1.0f;
+	tri_vertices[1].color[0] = +0.0f; tri_vertices[1].color[1] = +1.0f; tri_vertices[1].color[2] = +0.0f; tri_vertices[1].color[3] = +1.0f;
+	tri_vertices[2].color[0] = +0.0f; tri_vertices[2].color[1] = +0.0f; tri_vertices[2].color[2] = +1.0f; tri_vertices[2].color[3] = +1.0f;
 
 	GLushort *tri_indices = (GLushort *)malloc(NUM_INDICES * sizeof(GLushort));
 	tri_indices[0] = 0; tri_indices[1] = 1; tri_indices[2] = 2;
@@ -107,6 +115,10 @@ int main(int argc, char *argv[])
 			GLint vertex_loc = glGetAttribLocation(render_prog, "vertex");
 			glVertexAttribPointer(vertex_loc, NUM_AXES, GL_FLOAT, GL_FALSE, sizeof(struct vertex), (GLvoid *)offsetof(struct vertex, position));
 			glEnableVertexAttribArray(vertex_loc);
+
+			GLint color_loc = glGetAttribLocation(render_prog, "color");
+			glVertexAttribPointer(color_loc, NUM_AXES, GL_FLOAT, GL_FALSE, sizeof(struct vertex), (GLvoid *)offsetof(struct vertex, color));
+			glEnableVertexAttribArray(color_loc);
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -137,7 +149,7 @@ int main(int argc, char *argv[])
 
 			glBindVertexArray(vao);
 			{
-				glDrawElements(GL_TRIANGLES, NUM_INDICES, GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_PATCHES, NUM_INDICES, GL_UNSIGNED_SHORT, 0);
 			}
 			glBindVertexArray(0);
 		}
