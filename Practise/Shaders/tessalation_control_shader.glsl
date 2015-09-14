@@ -5,6 +5,10 @@ layout (vertices = 3) out;
 uniform float tess_inner;
 uniform float tess_outer;
 
+in vec4 vs_color[];
+
+patch out vec4 tcs_color;
+
 void main()
 {		
 	if (gl_InvocationID == 0)
@@ -16,4 +20,5 @@ void main()
 	}
 
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	tcs_color = vs_color[gl_InvocationID];
 }             

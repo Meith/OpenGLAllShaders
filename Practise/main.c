@@ -144,8 +144,8 @@ int main(int argc, char *argv[])
 
 		glUseProgram(render_prog);
 		{
-			glUniform1f(tessinner_loc, 5);
-			glUniform1f(tessouter_loc, 5);
+			glUniform1f(tessinner_loc, 15);
+			glUniform1f(tessouter_loc, 15);
 
 			glBindVertexArray(vao);
 			{
