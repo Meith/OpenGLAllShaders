@@ -8,6 +8,7 @@
 
 #define WIDTH 1024
 #define HEIGHT 768
+
 #define NUM_AXES 4
 #define NUM_VERTICES 3
 #define NUM_INDICES 3
@@ -40,13 +41,22 @@ int main(int argc, char *argv[])
 	printf("Using opengl version %s.\n", glGetString(GL_VERSION));
 	printf("Using glsl version %s.\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	/*GLuint comp_shader = return_shader("Shaders/compute_shader.glsl", GL_COMPUTE_SHADER);
+	GLuint comp_shader = return_shader("Shaders/compute_shader.glsl", GL_COMPUTE_SHADER);
 
 	GLuint compute_prog = glCreateProgram();
 	glAttachShader(compute_prog, comp_shader);
 	glLinkProgram(compute_prog);
+
+	GLint status;
+	glGetProgramiv(compute_prog, GL_LINK_STATUS, &status);
+	printf("Compute Shader link status %d\n", status);
+
+	GLchar error_log[512];
+	glGetProgramInfoLog(compute_prog, 512, NULL, error_log);
+	printf("Compute Program error log: %s\n", error_log);
+
 	glDeleteShader(comp_shader);
-*/
+
 	GLuint vert_shader = return_shader("Shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
 	GLuint tess_cont_shader = return_shader("Shaders/tessalation_control_shader.glsl", GL_TESS_CONTROL_SHADER);
 	GLuint tess_eval_shader = return_shader("Shaders/tessalation_evaluation_shader.glsl", GL_TESS_EVALUATION_SHADER);
@@ -61,13 +71,11 @@ int main(int argc, char *argv[])
 	glAttachShader(render_prog, frag_shader);
 	glLinkProgram(render_prog);
 
-	GLint status;
 	glGetProgramiv(render_prog, GL_LINK_STATUS, &status);
-	printf("Shader link status %d\n", status);
+	printf("Render Shader link status %d\n", status);
 
-	GLchar error_log[512];
 	glGetProgramInfoLog(render_prog, 512, NULL, error_log);
-	printf("Program error log: %s\n", error_log);
+	printf("Render Program error log: %s\n", error_log);
 
 	glDeleteShader(vert_shader);
 	glDeleteShader(tess_cont_shader);
@@ -90,9 +98,9 @@ int main(int argc, char *argv[])
 	
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vbo);
 	{
-		glBufferData(GL_ARRAY_BUFFER, NUM_VERTICES * sizeof(struct vertex), (struct vertex *)tri_vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, NUM_VERTICES * sizeof(struct vertex), (struct vertex *)tri_vertices, GL_DYNAMIC_DRAW);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	free(tri_vertices);
@@ -101,7 +109,7 @@ int main(int argc, char *argv[])
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	{
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, NUM_INDICES * sizeof(GLushort), (GLushort *)tri_indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, NUM_INDICES * sizeof(GLushort), (GLushort *)tri_indices, GL_DYNAMIC_DRAW);
 	}
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	free(tri_indices);
@@ -128,10 +136,14 @@ int main(int argc, char *argv[])
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+	GLint time_loc = glGetUniformLocation(compute_prog, "time");
+
 	GLint tessinner_loc = glGetUniformLocation(render_prog, "tess_inner");
 	GLint tessouter_loc = glGetUniformLocation(render_prog, "tess_outer");
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	float time;
 
 	SDL_Event event;
 	while (1)
@@ -141,6 +153,15 @@ int main(int argc, char *argv[])
 				break;
 
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glUseProgram(compute_prog);
+		{
+			time = SDL_GetTicks() / 1000.0f;
+			glUniform1f(time_loc, time);
+			glDispatchCompute(3, 1, 1);
+			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		}
+		glUseProgram(0);
 
 		glUseProgram(render_prog);
 		{
@@ -181,7 +202,7 @@ GLuint return_shader(GLchar const *shader_source, GLenum shader_type)
 	fseek(fptr, 0, SEEK_END);
 	length = ftell(fptr);
 
-	buffer = (GLchar *)malloc(length + 1);
+	buffer = (GLchar *)malloc((length + 1) * sizeof(GLchar));
 	fseek(fptr, 0, SEEK_SET);
 	fread(buffer, length, sizeof(GLchar), fptr);
 	buffer[length] = 0;
