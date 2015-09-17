@@ -71,7 +71,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
-    <ClCompile Include="Shader.c" />
+    <ClCompile Include="Shaders.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\compute_shader.glsl" />
@@ -82,7 +82,7 @@
     <None Include="Shaders\vertex_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Shaders.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

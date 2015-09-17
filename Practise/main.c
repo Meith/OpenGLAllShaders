@@ -16,7 +16,7 @@
 #include <stddef.h>
 
 #include "Types.h"
-#include "Shader.h"
+#include "Shaders.h"
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -59,51 +59,19 @@ int main(int argc, char *argv[])
 		Creating compute program consisting of the compute shader.	
 	*/
 
-	GLuint comp_shader = return_shader("Shaders/compute_shader.glsl", GL_COMPUTE_SHADER);
-
-	GLuint compute_prog = glCreateProgram();
-	glAttachShader(compute_prog, comp_shader);
-	glLinkProgram(compute_prog);
-
-	GLint status;
-	glGetProgramiv(compute_prog, GL_LINK_STATUS, &status);
-	printf("Compute Shader link status %d\n", status);
-
-	GLchar error_log[512];
-	glGetProgramInfoLog(compute_prog, 512, NULL, error_log);
-	printf("Compute Program error log: %s\n", error_log);
-
-	glDeleteShader(comp_shader);
+	struct ShaderPair compute_pair = { .shader_source = "Shaders/compute_shader.glsl", .shader_type = GL_COMPUTE_SHADER };
+	GLuint compute_program = Shaders_CreateShaderProgram(&compute_pair, 1);
 
 	/*
 		Creating the render program consisting of the vertex, fragment, tessellation control, tessellation evaluation, geometry and fragment shader.
 	*/
+
 
 	GLuint vert_shader = return_shader("Shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
 	GLuint tess_cont_shader = return_shader("Shaders/tessellation_control_shader.glsl", GL_TESS_CONTROL_SHADER);
 	GLuint tess_eval_shader = return_shader("Shaders/tessellation_evaluation_shader.glsl", GL_TESS_EVALUATION_SHADER);
 	GLuint geom_shader = return_shader("Shaders/geometry_shader.glsl", GL_GEOMETRY_SHADER);
 	GLuint frag_shader = return_shader("Shaders/fragment_shader.glsl", GL_FRAGMENT_SHADER);
-	
-	GLuint render_prog = glCreateProgram();
-	glAttachShader(render_prog, vert_shader);
-	glAttachShader(render_prog, tess_cont_shader);
-	glAttachShader(render_prog, tess_eval_shader);
-	glAttachShader(render_prog, geom_shader);
-	glAttachShader(render_prog, frag_shader);
-	glLinkProgram(render_prog);
-
-	glGetProgramiv(render_prog, GL_LINK_STATUS, &status);
-	printf("Render Shader link status %d\n", status);
-
-	glGetProgramInfoLog(render_prog, 512, NULL, error_log);
-	printf("Render Program error log: %s\n", error_log);
-
-	glDeleteShader(vert_shader);
-	glDeleteShader(tess_cont_shader);
-	glDeleteShader(tess_eval_shader);
-	glDeleteShader(geom_shader);
-	glDeleteShader(frag_shader);
 
 	/*
 		Creating and setting triangle vertex data.

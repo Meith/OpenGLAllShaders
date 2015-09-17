@@ -3,11 +3,10 @@
 
 #include <GL/glew.h>
 
-struct Shader
+struct ShaderPair
 {
-	GLuint program;
-	GLuint shaders[5];
-	GLint num_shaders;
+	GLchar const *shader_source;
+	GLenum shader_type;
 };
 
 #endif
