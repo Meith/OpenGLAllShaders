@@ -1,9 +1,3 @@
-/*
-	Tessellation evaluation shader takes in "patches" of triangles and needs to calculate new vertex positions of the sub-divided triangles.
-	In case of triangles, patches contain barycentric coordinates inside inbuilt variable gl_Tesscoord.
-	Using them we can create new vertex positions for each triangle. 
-*/
-
 #version 440 core
 
 layout (triangles, equal_spacing, cw) in;
