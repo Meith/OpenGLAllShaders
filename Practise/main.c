@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
 	*/
 
 	GLuint vert_shader = return_shader("Shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
-	GLuint tess_cont_shader = return_shader("Shaders/tessalation_control_shader.glsl", GL_TESS_CONTROL_SHADER);
-	GLuint tess_eval_shader = return_shader("Shaders/tessalation_evaluation_shader.glsl", GL_TESS_EVALUATION_SHADER);
+	GLuint tess_cont_shader = return_shader("Shaders/tessellation_control_shader.glsl", GL_TESS_CONTROL_SHADER);
+	GLuint tess_eval_shader = return_shader("Shaders/tessellation_evaluation_shader.glsl", GL_TESS_EVALUATION_SHADER);
 	GLuint geom_shader = return_shader("Shaders/geometry_shader.glsl", GL_GEOMETRY_SHADER);
 	GLuint frag_shader = return_shader("Shaders/fragment_shader.glsl", GL_FRAGMENT_SHADER);
 	
@@ -132,11 +132,11 @@ int main(int argc, char *argv[])
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vbo);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, vbo);
 	{
 		glBufferData(GL_SHADER_STORAGE_BUFFER, NUM_VERTICES * sizeof(struct vertex), (struct vertex *)tri_vertices, GL_DYNAMIC_DRAW);
 	}
-
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	/*
 		Free vertex data from the CPU after passing it to the GPU.
 	*/
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 			glEnableVertexAttribArray(color_loc);
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vbo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	}
 	glBindVertexArray(0);

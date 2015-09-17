@@ -32,13 +32,13 @@
     <None Include="Shaders\geometry_shader.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\tessalation_control_shader.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\tessalation_evaluation_shader.glsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\vertex_shader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\tessellation_control_shader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\tessellation_evaluation_shader.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

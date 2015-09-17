@@ -76,8 +76,8 @@
     <None Include="Shaders\compute_shader.glsl" />
     <None Include="Shaders\fragment_shader.glsl" />
     <None Include="Shaders\geometry_shader.glsl" />
-    <None Include="Shaders\tessalation_control_shader.glsl" />
-    <None Include="Shaders\tessalation_evaluation_shader.glsl" />
+    <None Include="Shaders\tessellation_control_shader.glsl" />
+    <None Include="Shaders\tessellation_evaluation_shader.glsl" />
     <None Include="Shaders\vertex_shader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
