@@ -71,6 +71,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="Shader.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\compute_shader.glsl" />
@@ -79,6 +80,10 @@
     <None Include="Shaders\tessellation_control_shader.glsl" />
     <None Include="Shaders\tessellation_evaluation_shader.glsl" />
     <None Include="Shaders\vertex_shader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

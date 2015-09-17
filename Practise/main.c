@@ -15,14 +15,15 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#include "Types.h"
+#include "Shader.h"
+
 #define WIDTH 1024
 #define HEIGHT 768
 
 #define NUM_AXES 4
 #define NUM_VERTICES 3
 #define NUM_INDICES 3
-
-GLuint return_shader(GLchar const *shader_source, GLenum shader_type);
 
 struct vertex
 {
@@ -246,39 +247,4 @@ int main(int argc, char *argv[])
 	SDL_DestroyWindow(gl_window);
 
 	return 0;
-}
-
-GLuint return_shader(GLchar const *shader_source, GLenum shader_type)
-{
-	FILE *fptr;
-	GLuint length;
-	GLchar *buffer;
-
-	fptr = fopen(shader_source, "rb");
-
-	fseek(fptr, 0, SEEK_END);
-	length = ftell(fptr);
-
-	buffer = (GLchar *)malloc((length + 1) * sizeof(GLchar));
-	fseek(fptr, 0, SEEK_SET);
-	fread(buffer, length, sizeof(GLchar), fptr);
-	buffer[length] = 0;
-
-	fclose(fptr);
-
-	GLuint shader = glCreateShader(shader_type);
-	glShaderSource(shader, 1, &buffer, NULL);
-	glCompileShader(shader);
-
-	free(buffer);
-
-	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	printf("Shader compile status %d\n", status);
-
-	GLchar error_log[512];
-	glGetShaderInfoLog(shader, 512, NULL, error_log);
-	printf("Shader error log: %s\n", error_log);
-
-	return shader;
 }
