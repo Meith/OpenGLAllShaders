@@ -60,4 +60,6 @@ GLuint Shaders_CreateShaderProgram(struct ShaderPair *shader_pair, GLint num_sha
 
 	for (i = 0; i < num_shaders; ++i)
 		glDeleteShader(shaders[i]);
+
+	return shader_program;
 }

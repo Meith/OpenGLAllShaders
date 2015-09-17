@@ -66,12 +66,12 @@ int main(int argc, char *argv[])
 		Creating the render program consisting of the vertex, fragment, tessellation control, tessellation evaluation, geometry and fragment shader.
 	*/
 
-
-	GLuint vert_shader = return_shader("Shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
-	GLuint tess_cont_shader = return_shader("Shaders/tessellation_control_shader.glsl", GL_TESS_CONTROL_SHADER);
-	GLuint tess_eval_shader = return_shader("Shaders/tessellation_evaluation_shader.glsl", GL_TESS_EVALUATION_SHADER);
-	GLuint geom_shader = return_shader("Shaders/geometry_shader.glsl", GL_GEOMETRY_SHADER);
-	GLuint frag_shader = return_shader("Shaders/fragment_shader.glsl", GL_FRAGMENT_SHADER);
+	struct ShaderPair render_pair[5] = { [0].shader_source = "Shaders/vertex_shader.glsl", [0].shader_type = GL_VERTEX_SHADER,
+										 [1].shader_source = "Shaders/tessellation_control_shader.glsl", [1].shader_type = GL_TESS_CONTROL_SHADER,
+										 [2].shader_source = "Shaders/tessellation_evaluation_shader.glsl", [2].shader_type = GL_TESS_EVALUATION_SHADER,
+										 [3].shader_source = "Shaders/geometry_shader.glsl", [3].shader_type = GL_GEOMETRY_SHADER,
+										 [4].shader_source = "Shaders/fragment_shader.glsl", [4].shader_type = GL_FRAGMENT_SHADER };
+	GLuint render_program = Shaders_CreateShaderProgram(&render_pair[0], 5);
 
 	/*
 		Creating and setting triangle vertex data.
@@ -136,11 +136,11 @@ int main(int argc, char *argv[])
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		{
-			GLint vertex_loc = glGetAttribLocation(render_prog, "vertex");
+			GLint vertex_loc = glGetAttribLocation(render_program, "vertex");
 			glVertexAttribPointer(vertex_loc, NUM_AXES, GL_FLOAT, GL_FALSE, sizeof(struct vertex), (GLvoid *)offsetof(struct vertex, position));
 			glEnableVertexAttribArray(vertex_loc);
 
-			GLint color_loc = glGetAttribLocation(render_prog, "color");
+			GLint color_loc = glGetAttribLocation(render_program, "color");
 			glVertexAttribPointer(color_loc, NUM_AXES, GL_FLOAT, GL_FALSE, sizeof(struct vertex), (GLvoid *)offsetof(struct vertex, color));
 			glEnableVertexAttribArray(color_loc);
 		}
@@ -152,10 +152,10 @@ int main(int argc, char *argv[])
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	GLint time_loc = glGetUniformLocation(compute_prog, "time");
+	GLint time_loc = glGetUniformLocation(compute_program, "time");
 
-	GLint tessinner_loc = glGetUniformLocation(render_prog, "tess_inner");
-	GLint tessouter_loc = glGetUniformLocation(render_prog, "tess_outer");
+	GLint tessinner_loc = glGetUniformLocation(render_program, "tess_inner");
+	GLint tessouter_loc = glGetUniformLocation(render_program, "tess_outer");
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(compute_prog);
+		glUseProgram(compute_program);
 		{
 			time = SDL_GetTicks() / 1000.0f;
 			glUniform1f(time_loc, time);
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 		}
 		glUseProgram(0);
 
-		glUseProgram(render_prog);
+		glUseProgram(render_program);
 		{
 			glUniform1f(tessinner_loc, 15);
 			glUniform1f(tessouter_loc, 15);
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 	glDeleteBuffers(1, &ebo);
 	glDeleteBuffers(1, &vbo);
 	glDeleteVertexArrays(1, &vao);
-	glDeleteProgram(render_prog);
+	glDeleteProgram(render_program);
 
 	SDL_GL_DeleteContext(gl_context);
 	SDL_DestroyWindow(gl_window);
