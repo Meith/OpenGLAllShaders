@@ -1,3 +1,8 @@
+/*
+	Geometry shader takes in whole primitives as inputs, and can perform multiple operations on them.
+	We can change the primitive, deform it, duplicate it and also move it to state a few.
+*/
+
 #version 440 core
 
 layout (triangles) in;

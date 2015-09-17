@@ -1,3 +1,10 @@
+/*
+	Tessellation control shader sets the number of times the triangle should be sub-divided.
+	gl_TessLevelInner and gl_TessLevelOuter hold these values. 
+	For every inner there are three outer values. 
+	Inner value represents number of nested primitives and outer value represents number of times each edge will be sub divided.
+*/
+
 #version 440 core
 
 layout (vertices = 3) out;
