@@ -38,7 +38,7 @@ struct Mesh Model_ProcessMesh(struct aiMesh *mesh, struct aiScene const *scene)
 	GLuint vertex_count = mesh->mNumVertices;
 	struct Vertex *vertices = (struct Vertex *)malloc(vertex_count * sizeof(struct Vertex));
 	GLuint *indices;
-	struct Texture *texture;
+	struct Texture *textures;
 
 	GLuint i;
 	for (i = 0; i < vertex_count; ++i)
@@ -72,5 +72,42 @@ struct Mesh Model_ProcessMesh(struct aiMesh *mesh, struct aiScene const *scene)
 		vertices[i].bitangent[2] = mesh->mBitangents[i].z;
 	}
 
+	GLuint current_index_count = 0;
+	GLuint total_index_count = 0;
+	GLuint j;
+	for (i = 0; i < mesh->mNumFaces; ++i)
+	{
+		struct aiFace face = mesh->mFaces[i];
+		total_index_count += face.mNumIndices;
+		indices = (GLuint *)realloc(indices, total_index_count * sizeof(GLuint));
 
+		for (j = current_index_count; j < total_index_count; ++j)
+			indices[j] = face.mIndices[j];
+	}
+
+	if (mesh->mMaterialIndex >= 0)
+	{
+		struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+
+		GLuint texture_counts[4] = { 0 };
+		texture_counts[0] = aiGetMaterialTextureCount(material, aiTextureType_DIFFUSE);
+		texture_counts[1] = aiGetMaterialTextureCount(material, aiTextureType_SPECULAR);
+		texture_counts[2] = aiGetMaterialTextureCount(material, aiTextureType_HEIGHT);
+		texture_counts[3] = aiGetMaterialTextureCount(material, aiTextureType_AMBIENT);
+
+		textures = (struct Texture *)malloc((texture_counts[0] + texture_counts[1] + texture_counts[2] + texture_counts[3]) * sizeof(struct Texture));
+		Model_LoadMaterialTextures(textures, 0, texture_counts[0], material, aiTextureType_DIFFUSE, "texture_diffuse");
+	}
+}
+
+void Model_LoadMaterialTextures(struct Texture *textures, GLuint start_index, GLuint end_index, struct aiMaterial *material, enum aiTextureType type, GLchar const *typeName)
+{
+	GLuint i;
+	for (i = start_index; i < end_index; ++i)
+	{
+		struct aiString string;
+		aiGetMaterialTexture(material, type, i, &string, NULL, NULL, NULL, NULL, NULL, NULL);
+
+		GLboolean skip = 0;
+	}
 }
