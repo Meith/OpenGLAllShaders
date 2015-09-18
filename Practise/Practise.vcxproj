@@ -51,7 +51,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -71,6 +71,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="Model.c" />
     <ClCompile Include="Shaders.c" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +83,7 @@
     <None Include="Shaders\vertex_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Model.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>
