@@ -8,6 +8,8 @@
 
 #include "Types.h"
 #include "Shaders.h"
+#include "Model.h"
+#include "Camera.h"
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -32,7 +34,7 @@ int main(int argc, char *argv[])
 	printf("Using opengl version %s.\n", glGetString(GL_VERSION));
 	printf("Using glsl version %s.\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	struct ShaderPair compute_pair = { .shader_source = "Shaders/compute_shader.glsl", .shader_type = GL_COMPUTE_SHADER };
+	/*struct ShaderPair compute_pair = { .shader_source = "Shaders/compute_shader.glsl", .shader_type = GL_COMPUTE_SHADER };
 	GLuint compute_program = Shaders_CreateShaderProgram(&compute_pair, 1);
 
 	struct ShaderPair render_pairs[5] = { [0].shader_source = "Shaders/vertex_shader.glsl", [0].shader_type = GL_VERTEX_SHADER,
@@ -40,13 +42,18 @@ int main(int argc, char *argv[])
 		[2].shader_source = "Shaders/tessellation_evaluation_shader.glsl", [2].shader_type = GL_TESS_EVALUATION_SHADER,
 		[3].shader_source = "Shaders/geometry_shader.glsl", [3].shader_type = GL_GEOMETRY_SHADER,
 		[4].shader_source = "Shaders/fragment_shader.glsl", [4].shader_type = GL_FRAGMENT_SHADER };
-	GLuint render_program = Shaders_CreateShaderProgram(&render_pairs[0], 5);
+	GLuint render_program = Shaders_CreateShaderProgram(&render_pairs[0], 5);*/
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	struct ShaderPair nanosuit_pair[2] = { [0].shader_source = "Shaders/vertex_shader.glsl", [0].shader_type = GL_VERTEX_SHADER,
+		[1].shader_source = "Shaders/fragment_shader.glsl", [1].shader_type = GL_FRAGMENT_SHADER };
+	GLuint nanosuit_program = Shaders_CreateShaderProgram(&nanosuit_pair[0], 2);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	struct Model *nanosuit = Model_Load("Objects/Nanosuit/nanosuit.obj");
+	Camera *camera = Camera_Init();
 
-	GLfloat time;
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	SDL_Event event;
 	while (1)
@@ -57,7 +64,7 @@ int main(int argc, char *argv[])
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(compute_program);
+		/*glUseProgram(compute_program);
 		{
 			glDispatchCompute(3, 1, 1);
 		}
@@ -66,13 +73,20 @@ int main(int argc, char *argv[])
 		glUseProgram(render_program);
 		{
 		}
+		glUseProgram(0);*/
+
+		glUseProgram(nanosuit_program);
+		{
+			Camera_Render(camera, nanosuit_program);
+			Model_Render(nanosuit, nanosuit_program);
+		}
 		glUseProgram(0);
 
 		SDL_GL_SwapWindow(gl_window);
 	}
 	
-	glDeleteProgram(compute_program);
-	glDeleteProgram(render_program);
+	/*glDeleteProgram(compute_program);
+	glDeleteProgram(render_program);*/
 
 	SDL_GL_DeleteContext(gl_context);
 	SDL_DestroyWindow(gl_window);

@@ -1,6 +1,8 @@
 #include "Model.h"
+#include "Mesh.h"
 
 #include <assimp/postprocess.h>
+#include <SOIL/SOIL.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -8,23 +10,32 @@
 struct Model *Model_Load(GLchar const *model_source)
 {
 	struct Model *model = (struct Model *)malloc(sizeof(struct Model));
+	model->mesh_count = 0;
+	model->meshes = NULL;
+	model->textures_loaded = NULL;
 
 	struct aiScene const *scene = aiImportFile(model_source, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
-	strncpy(model->directory, model_source, strrchr(model_source, '/'));
+	char *directory_length = strrchr(model_source, '/') + 1;
+
+	GLuint i;
+	for (i = 0; model_source + i != directory_length; ++i)
+		model->directory[i] = model_source[i];
+	model->directory[i] = 0;
 
 	Model_ProcessNode(model, scene->mRootNode, scene);
+
+	return model;
 }
 
 void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene const *scene)
 {
-	static GLuint mesh_count = 0;
 	GLuint i;
 	for (i = 0; i < node->mNumMeshes; ++i)
 	{
 		struct aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-		model->meshes = (struct Mesh *)realloc(model->meshes, (++mesh_count) * sizeof(struct Mesh));
-		model->meshes[mesh_count - 1] = Model_ProcessMesh(mesh, scene);
+		model->meshes = (struct Mesh *)realloc(model->meshes, (++model->mesh_count) * sizeof(struct Mesh));
+		model->meshes[model->mesh_count - 1] = Model_ProcessMesh(model, mesh, scene);
 	}
 
 	for (i = 0; i < node->mNumChildren; ++i)
@@ -33,12 +44,12 @@ void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene 
 	}
 }
 
-struct Mesh Model_ProcessMesh(struct aiMesh *mesh, struct aiScene const *scene)
+struct Mesh Model_ProcessMesh(struct Model *model, struct aiMesh *mesh, struct aiScene const *scene)
 {
 	GLuint vertex_count = mesh->mNumVertices;
 	struct Vertex *vertices = (struct Vertex *)malloc(vertex_count * sizeof(struct Vertex));
-	GLuint *indices;
-	struct Texture *textures;
+	GLuint *indices = NULL;
+	struct Texture *textures = NULL;
 
 	GLuint i;
 	for (i = 0; i < vertex_count; ++i)
@@ -74,17 +85,17 @@ struct Mesh Model_ProcessMesh(struct aiMesh *mesh, struct aiScene const *scene)
 
 	GLuint current_index_count = 0;
 	GLuint total_index_count = 0;
-	GLuint j;
 	for (i = 0; i < mesh->mNumFaces; ++i)
 	{
 		struct aiFace face = mesh->mFaces[i];
 		total_index_count += face.mNumIndices;
 		indices = (GLuint *)realloc(indices, total_index_count * sizeof(GLuint));
-
-		for (j = current_index_count; j < total_index_count; ++j)
-			indices[j] = face.mIndices[j];
+		GLuint j;
+		for (j = 0; current_index_count < total_index_count; ++current_index_count, ++j)
+			indices[current_index_count] = face.mIndices[j];
 	}
 
+	GLuint total_texture_count = 0;
 	if (mesh->mMaterialIndex >= 0)
 	{
 		struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
@@ -94,20 +105,79 @@ struct Mesh Model_ProcessMesh(struct aiMesh *mesh, struct aiScene const *scene)
 		texture_counts[1] = aiGetMaterialTextureCount(material, aiTextureType_SPECULAR);
 		texture_counts[2] = aiGetMaterialTextureCount(material, aiTextureType_HEIGHT);
 		texture_counts[3] = aiGetMaterialTextureCount(material, aiTextureType_AMBIENT);
+		total_texture_count = texture_counts[0] + texture_counts[1] + texture_counts[2] + texture_counts[3];
 
-		textures = (struct Texture *)malloc((texture_counts[0] + texture_counts[1] + texture_counts[2] + texture_counts[3]) * sizeof(struct Texture));
-		Model_LoadMaterialTextures(textures, 0, texture_counts[0], material, aiTextureType_DIFFUSE, "texture_diffuse");
+		textures = (struct Texture *)malloc((total_texture_count)* sizeof(struct Texture));
+		Model_LoadMaterialTextures(model, textures, 0, texture_counts[0], material, aiTextureType_DIFFUSE, "texture_diffuse");
+		Model_LoadMaterialTextures(model, textures, texture_counts[0], texture_counts[0] + texture_counts[1], material, aiTextureType_SPECULAR, "texture_specular");
+		Model_LoadMaterialTextures(model, textures, texture_counts[0] + texture_counts[1], texture_counts[0] + texture_counts[1] + texture_counts[2], material, aiTextureType_HEIGHT, "texture_normal");
+		Model_LoadMaterialTextures(model, textures, texture_counts[0] + texture_counts[1] + texture_counts[2], total_texture_count, material, aiTextureType_AMBIENT, "texture_height");
 	}
+
+	return Mesh_Init(vertices, vertex_count, indices, total_index_count, textures, total_texture_count);
 }
 
-void Model_LoadMaterialTextures(struct Texture *textures, GLuint start_index, GLuint end_index, struct aiMaterial *material, enum aiTextureType type, GLchar const *typeName)
+void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, GLuint start_index, GLuint end_index, struct aiMaterial *material, enum aiTextureType type, GLchar const *type_name)
 {
+	static GLuint current_textures_loaded_count = 0;
 	GLuint i;
-	for (i = start_index; i < end_index; ++i)
+	GLuint j;
+	for (i = 0; i < end_index - start_index; ++i)
 	{
 		struct aiString string;
 		aiGetMaterialTexture(material, type, i, &string, NULL, NULL, NULL, NULL, NULL, NULL);
 
 		GLboolean skip = 0;
+		for (j = 0; j < current_textures_loaded_count; ++j)
+		{
+			if (model->textures_loaded[j].path.data == string.data)
+			{
+				textures[start_index++] = model->textures_loaded[j];
+				skip = 1;
+				break;
+			}
+		}
+
+		if (!skip)
+		{
+			textures[start_index].id = Model_TextureFromFile(string.data, model->directory, 0);
+			strcpy(textures[start_index].type, type_name);
+			textures[start_index].path = string;
+			model->textures_loaded = (struct Texture *)realloc(model->textures_loaded, (current_textures_loaded_count + 1) * sizeof(struct Texture));
+			model->textures_loaded[current_textures_loaded_count++] = textures[start_index++];
+		}
+	}
+}
+
+GLint Model_TextureFromFile(const GLchar* path, GLchar const *directory, GLboolean gamma)
+{
+	GLchar filename[100];
+	strcpy(filename, directory);
+	strcat(filename, path);
+
+	GLuint texture_id;
+	glGenTextures(1, &texture_id);
+	GLint width, height;
+	unsigned char *image = SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glTexImage2D(GL_TEXTURE_2D, 0, gamma ? GL_SRGB : GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(image);
+	return texture_id;
+}
+
+void Model_Render(struct Model *model, GLuint shader_prog)
+{
+	GLuint i;
+	for (i = 0; i < model->mesh_count; ++i)
+	{
+		Mesh_Render(&model->meshes[i], shader_prog);
 	}
 }

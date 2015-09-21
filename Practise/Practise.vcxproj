@@ -70,9 +70,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Mesh.c" />
     <ClCompile Include="Model.c" />
     <ClCompile Include="Shaders.c" />
+    <ClCompile Include="Transform.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\compute_shader.glsl" />
@@ -83,9 +86,13 @@
     <None Include="Shaders\vertex_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Shaders.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -25,6 +25,9 @@ struct Mesh
 	struct Vertex *vertices;
 	GLuint *indices;
 	struct Texture *textures;
+	GLuint vertex_count;
+	GLuint index_count;
+	GLuint texture_count;
 	GLuint vao;
 	GLuint vbo;
 	GLuint ebo;
@@ -34,6 +37,7 @@ struct Model
 {
 	struct Texture *textures_loaded;
 	struct Mesh *meshes;
+	GLuint mesh_count;
 	GLchar directory[50];
 };
 
@@ -41,6 +45,13 @@ struct ShaderPair
 {
 	GLchar const *shader_source;
 	GLenum shader_type;
+};
+
+struct Camera
+{
+	GLfloat eye[3];
+	GLfloat look[3];
+	GLfloat up[3];
 };
 
 #endif

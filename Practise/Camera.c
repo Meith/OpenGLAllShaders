@@ -1,0 +1,76 @@
+#include "Camera.h"
+#include "Vector.h"
+void Camera_GetViewMat(GLfloat view_matrix[4][4], struct Camera const *camera)
+{
+	GLfloat forward[3];
+	VectorOperation(forward, camera->eye, camera->look, 3, +)
+
+	GLfloat n[3];
+	VectorOperation(n, camera->eye, forward, 3, -)
+	vec3_Norm(n, n);
+
+	vec3 u;
+	vec3_CrossProd(u, cam_up, n);
+	vec3_Norm(u, u);
+
+	vec3 v;
+	vec3_CrossProd(v, n, u);
+
+	int i = 0;
+	for (i = 0; i < 3; ++i)
+		camera->view_matrix[0][i] = u[i];
+
+	for (i = 0; i < 3; ++i)
+		camera->view_matrix[1][i] = v[i];
+
+	for (i = 0; i < 3; ++i)
+		camera->view_matrix[2][i] = n[i];
+
+	for (i = 0; i < 3; ++i)
+		camera->view_matrix[3][i] = 0.0f;
+
+	vec3_Negate(u, u);
+	vec3_Negate(v, v);
+	vec3_Negate(n, n);
+
+	camera->view_matrix[0][3] = vec3_DotProd(u, camera->transform.position);
+	camera->view_matrix[1][3] = vec3_DotProd(v, camera->transform.position);
+	camera->view_matrix[2][3] = vec3_DotProd(n, camera->transform.position);
+	camera->view_matrix[3][3] = 1.0f;
+}
+
+void Camera_GetProjMat(Camera *camera)
+{
+	float const a = 1.0f / (float)tan(camera->fov / 2.0f);
+
+	camera->projection_matrix[0][0] = a / camera->aspect_ratio;
+	camera->projection_matrix[0][1] = 0.0f;
+	camera->projection_matrix[0][2] = 0.0f;
+	camera->projection_matrix[0][3] = 0.0f;
+
+	camera->projection_matrix[1][0] = 0.0f;
+	camera->projection_matrix[1][1] = a;
+	camera->projection_matrix[1][2] = 0.0f;
+	camera->projection_matrix[1][3] = 0.0f;
+
+	camera->projection_matrix[2][0] = 0.0f;
+	camera->projection_matrix[2][1] = 0.0f;
+	camera->projection_matrix[2][2] = -(camera->far + camera->near) / (camera->far - camera->near);
+	camera->projection_matrix[2][3] = -2 * camera->far * camera->near / (camera->far - camera->near);
+
+	camera->projection_matrix[3][0] = 0.0f;
+	camera->projection_matrix[3][1] = 0.0f;
+	camera->projection_matrix[3][2] = -1.0f;
+	camera->projection_matrix[3][3] = 0.0f;
+}
+
+void Camera_Render(Camera *camera, GLuint shader_prog)
+{
+	glUniformMatrix4fv(glGetUniformLocation(shader_prog, "u_proj"), 1, GL_TRUE, &camera->projection_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader_prog, "u_view"), 1, GL_TRUE, &camera->view_matrix[0][0]);
+}
+
+void Camera_Destroy(Camera *camera)
+{
+	free(camera);
+}
