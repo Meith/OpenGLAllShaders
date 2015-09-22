@@ -4,6 +4,14 @@
 #include <GL/glew.h>
 #include <assimp/cimport.h>
 
+#define PI 3.141592f
+
+typedef GLfloat vec2[2];
+typedef GLfloat vec3[3];
+typedef GLfloat vec4[4];
+typedef vec4 mat4x4[4];
+typedef GLfloat quat[4];
+
 struct Vertex
 {
 	GLfloat position[3];
@@ -47,11 +55,11 @@ struct ShaderPair
 	GLenum shader_type;
 };
 
-struct Camera
-{
-	GLfloat eye[3];
-	GLfloat look[3];
-	GLfloat up[3];
-};
+//struct Camera
+//{
+//	GLfloat eye[3];
+//	GLfloat look[3];
+//	GLfloat up[3];
+//};
 
 #endif

@@ -1,12 +1,48 @@
 #include "Camera.h"
-#include "Vector.h"
-void Camera_GetViewMat(GLfloat view_matrix[4][4], struct Camera const *camera)
-{
-	GLfloat forward[3];
-	VectorOperation(forward, camera->eye, camera->look, 3, +)
 
-	GLfloat n[3];
-	VectorOperation(n, camera->eye, forward, 3, -)
+#include <stdlib.h>
+#include <string.h>
+
+Camera *Camera_Init()
+{
+	Camera *camera = (Camera *)malloc(sizeof(Camera));
+
+	camera->transform = *Transform_Init();
+	camera->transform.position[1] = 7.5f;
+	camera->transform.position[2] = 20.0f;
+
+	camera->fov = 0.785398f;
+	camera->aspect_ratio = 1.333333f;
+	camera->near = 0.1f;
+	camera->far = 100.0f;
+
+	Camera_GetViewMat(camera);
+	Camera_GetProjMat(camera);
+
+	return camera;
+}
+
+void Camera_GetViewMat(Camera *camera)
+{
+	mat4x4 R;
+	mat4x4_Rot(R, camera->transform.quaternion);
+
+	vec3 forward = { 0.0f, 0.0f, -1.0f };
+	vec3 cam_forward;
+	mat3x3_MulVec3(cam_forward, R, forward);
+
+	vec3 right = { 1.0f, 0.0f, 0.0f };
+	vec3 cam_right;
+	mat3x3_MulVec3(cam_right, R, right);
+
+	vec3 cam_up;
+	vec3_CrossProd(cam_up, cam_right, cam_forward);
+
+	vec3 target;
+	vec3_Add(target, cam_forward, camera->transform.position);
+
+	vec3 n;
+	vec3_Sub(n, camera->transform.position, target);
 	vec3_Norm(n, n);
 
 	vec3 u;
