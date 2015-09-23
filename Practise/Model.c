@@ -13,6 +13,7 @@ struct Model *Model_Load(GLchar const *model_source)
 	model->mesh_count = 0;
 	model->meshes = NULL;
 	model->textures_loaded = NULL;
+	model->textures_loaded_count = 0;
 
 	struct aiScene const *scene = aiImportFile(model_source, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
@@ -34,8 +35,8 @@ void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene 
 	for (i = 0; i < node->mNumMeshes; ++i)
 	{
 		struct aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-		model->meshes = (struct Mesh *)realloc(model->meshes, (++model->mesh_count) * sizeof(struct Mesh));
-		model->meshes[model->mesh_count - 1] = Model_ProcessMesh(model, mesh, scene);
+		model->meshes = (struct Mesh *)realloc(model->meshes, (model->mesh_count + 1) * sizeof(struct Mesh));
+		model->meshes[model->mesh_count++] = Model_ProcessMesh(model, mesh, scene);
 	}
 
 	for (i = 0; i < node->mNumChildren; ++i)
@@ -119,20 +120,21 @@ struct Mesh Model_ProcessMesh(struct Model *model, struct aiMesh *mesh, struct a
 
 void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, GLuint start_index, GLuint end_index, struct aiMaterial *material, enum aiTextureType type, GLchar const *type_name)
 {
-	static GLuint current_textures_loaded_count = 0;
 	GLuint i;
 	GLuint j;
-	for (i = 0; i < end_index - start_index; ++i)
+	GLuint k = start_index;
+	GLuint texture_type_count = end_index - start_index;
+	for (i = 0; i < texture_type_count; ++i)
 	{
 		struct aiString string;
 		aiGetMaterialTexture(material, type, i, &string, NULL, NULL, NULL, NULL, NULL, NULL);
 
 		GLboolean skip = 0;
-		for (j = 0; j < current_textures_loaded_count; ++j)
+		for (j = 0; j < model->textures_loaded_count; ++j)
 		{
 			if (model->textures_loaded[j].path.data == string.data)
 			{
-				textures[start_index++] = model->textures_loaded[j];
+				textures[k++] = model->textures_loaded[j];
 				skip = 1;
 				break;
 			}
@@ -140,11 +142,11 @@ void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, G
 
 		if (!skip)
 		{
-			textures[start_index].id = Model_TextureFromFile(string.data, model->directory, 0);
-			strcpy(textures[start_index].type, type_name);
-			textures[start_index].path = string;
-			model->textures_loaded = (struct Texture *)realloc(model->textures_loaded, (current_textures_loaded_count + 1) * sizeof(struct Texture));
-			model->textures_loaded[current_textures_loaded_count++] = textures[start_index++];
+			textures[k].id = Model_TextureFromFile(string.data, model->directory, 0);
+			strcpy(textures[k].type, type_name);
+			textures[k].path = string;
+			model->textures_loaded = (struct Texture *)realloc(model->textures_loaded, (model->textures_loaded_count + 1) * sizeof(struct Texture));
+			model->textures_loaded[model->textures_loaded_count++] = textures[k++];
 		}
 	}
 }

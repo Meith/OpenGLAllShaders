@@ -93,7 +93,7 @@ void Mesh_Render(struct Mesh *mesh, GLuint shader_program)
 
 	glBindVertexArray(mesh->vao);
 	{
-		glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_PATCHES, mesh->index_count, GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
 
