@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glEnable(GL_DEPTH_TEST);
 
 	SDL_Event event;
 	while (1)

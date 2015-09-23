@@ -1,34 +1,7 @@
 #include "Mesh.h"
 
-#include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
-
-struct Mesh Mesh_Init(struct Vertex *vertices, GLuint vertex_count, GLuint *indices, GLuint index_count, struct Texture *textures, GLuint texture_count)
-{
-	struct Mesh mesh;
-	
-	mesh.vertices = (struct Vertex *)malloc(vertex_count * sizeof(struct Vertex));
-	GLuint i;
-	for (i = 0; i < vertex_count; ++i)
-		mesh.vertices[i] = vertices[i];
-
-	mesh.indices = (GLuint *)malloc(index_count * sizeof(GLuint));
-	for (i = 0; i < index_count; ++i)
-		mesh.indices[i] = indices[i];
-
-	mesh.textures = (struct Texture *)malloc(texture_count * sizeof(struct Texture));
-	for (i = 0; i < texture_count; ++i)
-		mesh.textures[i] = textures[i];
-
-	mesh.vertex_count = vertex_count;
-	mesh.index_count = index_count;
-	mesh.texture_count = texture_count;
-
-	Mesh_Setup(&mesh);
-
-	return mesh;
-}
 
 void Mesh_Setup(struct Mesh *mesh)
 {

@@ -11,6 +11,8 @@ Camera *Camera_Init()
 	camera->transform.position[1] = 7.5f;
 	camera->transform.position[2] = 20.0f;
 
+	vec3 y_axis = { 0.0f, 1.0f, 0.0f };
+	//Transform_RotateAxis(&camera->transform, y_axis, 180.0f);
 	camera->fov = 0.785398f;
 	camera->aspect_ratio = 1.333333f;
 	camera->near = 0.1f;

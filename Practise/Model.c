@@ -13,6 +13,7 @@ struct Model *Model_Load(GLchar const *model_source)
 	model->mesh_count = 0;
 	model->meshes = NULL;
 	model->textures_loaded = NULL;
+	model->textures_loaded_count = 0;
 
 	struct aiScene const *scene = aiImportFile(model_source, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
@@ -30,12 +31,13 @@ struct Model *Model_Load(GLchar const *model_source)
 
 void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene const *scene)
 {
+	model->meshes = (struct Mesh*)realloc(model->meshes, (model->mesh_count + node->mNumMeshes) * sizeof(struct Mesh));
+
 	GLuint i;
 	for (i = 0; i < node->mNumMeshes; ++i)
 	{
-		struct aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-		model->meshes = (struct Mesh *)realloc(model->meshes, (++model->mesh_count) * sizeof(struct Mesh));
-		model->meshes[model->mesh_count - 1] = Model_ProcessMesh(model, mesh, scene);
+		struct aiMesh *ai_mesh = scene->mMeshes[node->mMeshes[i]];
+		Model_ProcessMesh(model, ai_mesh, scene);
 	}
 
 	for (i = 0; i < node->mNumChildren; ++i)
@@ -44,95 +46,98 @@ void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene 
 	}
 }
 
-struct Mesh Model_ProcessMesh(struct Model *model, struct aiMesh *mesh, struct aiScene const *scene)
+void Model_ProcessMesh(struct Model *model, struct aiMesh *ai_mesh, struct aiScene const *scene)
 {
-	GLuint vertex_count = mesh->mNumVertices;
-	struct Vertex *vertices = (struct Vertex *)malloc(vertex_count * sizeof(struct Vertex));
-	GLuint *indices = NULL;
-	struct Texture *textures = NULL;
+	struct Mesh *current_mesh = &model->meshes[model->mesh_count];
+	
+	current_mesh->vertex_count = ai_mesh->mNumVertices;
+	current_mesh->vertices = (struct Vertex *)malloc(current_mesh->vertex_count * sizeof(struct Vertex));
 
 	GLuint i;
-	for (i = 0; i < vertex_count; ++i)
+	for (i = 0; i < current_mesh->vertex_count; ++i)
 	{
-		vertices[i].position[0] = mesh->mVertices[i].x;
-		vertices[i].position[1] = mesh->mVertices[i].y;
-		vertices[i].position[2] = mesh->mVertices[i].z;
+		current_mesh->vertices[i].position[0] = ai_mesh->mVertices[i].x;
+		current_mesh->vertices[i].position[1] = ai_mesh->mVertices[i].y;
+		current_mesh->vertices[i].position[2] = ai_mesh->mVertices[i].z;
+	
+		current_mesh->vertices[i].normal[0] = ai_mesh->mNormals[i].x;
+		current_mesh->vertices[i].normal[1] = ai_mesh->mNormals[i].y;
+		current_mesh->vertices[i].normal[2] = ai_mesh->mNormals[i].z;
 
-		vertices[i].normal[0] = mesh->mNormals[i].x;
-		vertices[i].normal[1] = mesh->mNormals[i].y;
-		vertices[i].normal[2] = mesh->mNormals[i].z;
-
-		if (mesh->mTextureCoords[0])
+		if (ai_mesh->mTextureCoords[0])
 		{
-			vertices[i].texcoords[0] = mesh->mTextureCoords[0][i].x;
-			vertices[i].texcoords[1] = mesh->mTextureCoords[0][i].y;
+			current_mesh->vertices[i].texcoords[0] = ai_mesh->mTextureCoords[0][i].x;
+			current_mesh->vertices[i].texcoords[1] = ai_mesh->mTextureCoords[0][i].y;
 		}
 
 		else
 		{
-			vertices[i].texcoords[0] = 0.0f;
-			vertices[i].texcoords[1] = 0.0f;
+			current_mesh->vertices[i].texcoords[0] = 0.0f;
+			current_mesh->vertices[i].texcoords[1] = 0.0f;
 		}
 
-		vertices[i].tangent[0] = mesh->mTangents[i].x;
-		vertices[i].tangent[1] = mesh->mTangents[i].y;
-		vertices[i].tangent[2] = mesh->mTangents[i].z;
+		current_mesh->vertices[i].tangent[0] = ai_mesh->mTangents[i].x;
+		current_mesh->vertices[i].tangent[1] = ai_mesh->mTangents[i].y;
+		current_mesh->vertices[i].tangent[2] = ai_mesh->mTangents[i].z;
 
-		vertices[i].bitangent[0] = mesh->mBitangents[i].x;
-		vertices[i].bitangent[1] = mesh->mBitangents[i].y;
-		vertices[i].bitangent[2] = mesh->mBitangents[i].z;
+		current_mesh->vertices[i].bitangent[0] = ai_mesh->mBitangents[i].x;
+		current_mesh->vertices[i].bitangent[1] = ai_mesh->mBitangents[i].y;
+		current_mesh->vertices[i].bitangent[2] = ai_mesh->mBitangents[i].z;
 	}
 
+	current_mesh->indices = NULL;
+	current_mesh->index_count = 0;
 	GLuint current_index_count = 0;
-	GLuint total_index_count = 0;
-	for (i = 0; i < mesh->mNumFaces; ++i)
+	for (i = 0; i < ai_mesh->mNumFaces; ++i)
 	{
-		struct aiFace face = mesh->mFaces[i];
-		total_index_count += face.mNumIndices;
-		indices = (GLuint *)realloc(indices, total_index_count * sizeof(GLuint));
+		struct aiFace face = ai_mesh->mFaces[i];
+		current_mesh->index_count += face.mNumIndices;
+		current_mesh->indices = (GLuint *)realloc(current_mesh->indices, current_mesh->index_count * sizeof(GLuint));
 		GLuint j;
-		for (j = 0; current_index_count < total_index_count; ++current_index_count, ++j)
-			indices[current_index_count] = face.mIndices[j];
+		for (j = 0; current_index_count < current_mesh->index_count; ++current_index_count, ++j)
+			current_mesh->indices[current_index_count] = face.mIndices[j];
 	}
 
-	GLuint total_texture_count = 0;
-	if (mesh->mMaterialIndex >= 0)
+	current_mesh->textures = NULL;
+	current_mesh->texture_count = 0;
+	if (ai_mesh->mMaterialIndex >= 0)
 	{
-		struct aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+		struct aiMaterial *material = scene->mMaterials[ai_mesh->mMaterialIndex];
 
 		GLuint texture_counts[4] = { 0 };
 		texture_counts[0] = aiGetMaterialTextureCount(material, aiTextureType_DIFFUSE);
 		texture_counts[1] = aiGetMaterialTextureCount(material, aiTextureType_SPECULAR);
 		texture_counts[2] = aiGetMaterialTextureCount(material, aiTextureType_HEIGHT);
 		texture_counts[3] = aiGetMaterialTextureCount(material, aiTextureType_AMBIENT);
-		total_texture_count = texture_counts[0] + texture_counts[1] + texture_counts[2] + texture_counts[3];
+		current_mesh->texture_count = texture_counts[0] + texture_counts[1] + texture_counts[2] + texture_counts[3];
 
-		textures = (struct Texture *)malloc((total_texture_count)* sizeof(struct Texture));
-		Model_LoadMaterialTextures(model, textures, 0, texture_counts[0], material, aiTextureType_DIFFUSE, "texture_diffuse");
-		Model_LoadMaterialTextures(model, textures, texture_counts[0], texture_counts[0] + texture_counts[1], material, aiTextureType_SPECULAR, "texture_specular");
-		Model_LoadMaterialTextures(model, textures, texture_counts[0] + texture_counts[1], texture_counts[0] + texture_counts[1] + texture_counts[2], material, aiTextureType_HEIGHT, "texture_normal");
-		Model_LoadMaterialTextures(model, textures, texture_counts[0] + texture_counts[1] + texture_counts[2], total_texture_count, material, aiTextureType_AMBIENT, "texture_height");
+		current_mesh->textures = (struct Texture *)malloc((current_mesh->texture_count)* sizeof(struct Texture));
+		Model_LoadMaterialTextures(model, current_mesh->textures, 0, texture_counts[0], material, aiTextureType_DIFFUSE, "texture_diffuse");
+		Model_LoadMaterialTextures(model, current_mesh->textures, texture_counts[0], texture_counts[0] + texture_counts[1], material, aiTextureType_SPECULAR, "texture_specular");
+		Model_LoadMaterialTextures(model, current_mesh->textures, texture_counts[0] + texture_counts[1], texture_counts[0] + texture_counts[1] + texture_counts[2], material, aiTextureType_HEIGHT, "texture_normal");
+		Model_LoadMaterialTextures(model, current_mesh->textures, texture_counts[0] + texture_counts[1] + texture_counts[2], current_mesh->texture_count, material, aiTextureType_AMBIENT, "texture_height");
 	}
 
-	return Mesh_Init(vertices, vertex_count, indices, total_index_count, textures, total_texture_count);
+	model->mesh_count++;
 }
 
 void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, GLuint start_index, GLuint end_index, struct aiMaterial *material, enum aiTextureType type, GLchar const *type_name)
 {
-	static GLuint current_textures_loaded_count = 0;
 	GLuint i;
 	GLuint j;
-	for (i = 0; i < end_index - start_index; ++i)
+	GLuint k = start_index;
+	GLuint texture_type_count = end_index - start_index;
+	for (i = 0; i < texture_type_count; ++i)
 	{
 		struct aiString string;
 		aiGetMaterialTexture(material, type, i, &string, NULL, NULL, NULL, NULL, NULL, NULL);
 
 		GLboolean skip = 0;
-		for (j = 0; j < current_textures_loaded_count; ++j)
+		for (j = 0; j < model->textures_loaded_count; ++j)
 		{
 			if (model->textures_loaded[j].path.data == string.data)
 			{
-				textures[start_index++] = model->textures_loaded[j];
+				textures[k++] = model->textures_loaded[j];
 				skip = 1;
 				break;
 			}
@@ -140,11 +145,11 @@ void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, G
 
 		if (!skip)
 		{
-			textures[start_index].id = Model_TextureFromFile(string.data, model->directory, 0);
-			strcpy(textures[start_index].type, type_name);
-			textures[start_index].path = string;
-			model->textures_loaded = (struct Texture *)realloc(model->textures_loaded, (current_textures_loaded_count + 1) * sizeof(struct Texture));
-			model->textures_loaded[current_textures_loaded_count++] = textures[start_index++];
+			textures[k].id = Model_TextureFromFile(string.data, model->directory, 0);
+			strcpy(textures[k].type, type_name);
+			textures[k].path = string;
+			model->textures_loaded = (struct Texture *)realloc(model->textures_loaded, (model->textures_loaded_count + 1) * sizeof(struct Texture));
+			model->textures_loaded[model->textures_loaded_count++] = textures[k++];
 		}
 	}
 }

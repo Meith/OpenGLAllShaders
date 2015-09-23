@@ -44,6 +44,7 @@ struct Mesh
 struct Model
 {
 	struct Texture *textures_loaded;
+	GLuint textures_loaded_count;
 	struct Mesh *meshes;
 	GLuint mesh_count;
 	GLchar directory[50];
