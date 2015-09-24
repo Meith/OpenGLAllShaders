@@ -118,6 +118,7 @@ void Model_ProcessMesh(struct Model *model, struct aiMesh *ai_mesh, struct aiSce
 		Model_LoadMaterialTextures(model, current_mesh->textures, texture_counts[0] + texture_counts[1] + texture_counts[2], current_mesh->texture_count, material, aiTextureType_AMBIENT, "texture_height");
 	}
 
+	Mesh_Setup(current_mesh);
 	model->mesh_count++;
 }
 
@@ -135,7 +136,7 @@ void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, G
 		GLboolean skip = 0;
 		for (j = 0; j < model->textures_loaded_count; ++j)
 		{
-			if (model->textures_loaded[j].path.data == string.data)
+			if (strcmp(model->textures_loaded[j].path.data, string.data) == 0)
 			{
 				textures[k++] = model->textures_loaded[j];
 				skip = 1;
