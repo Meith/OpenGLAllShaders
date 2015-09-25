@@ -50,13 +50,13 @@ void Mesh_Render(struct Mesh *mesh, GLuint shader_program)
 		GLchar name[25];
 		strcpy(name, mesh->textures[i].type);
 		GLchar number[3];
-		if (strcmp(name, "texture_diffuse"))
+		if (strcmp(name, "texture_diffuse") == 0)
 			sprintf(number, "%d", diffuse_no++);
-		else if (strcmp(name, "texture_specular"))
+		else if (strcmp(name, "texture_specular") == 0)
 			sprintf(number, "%d", specular_no++);
-		else if (strcmp(name, "texture_normal"))
+		else if (strcmp(name, "texture_normal") == 0)
 			sprintf(number, "%d", normal_no++);
-		else if (strcmp(name, "texture_height"))
+		else if (strcmp(name, "texture_height") == 0)
 			sprintf(number, "%d", height_no++);
 		strcat(name, number);
 

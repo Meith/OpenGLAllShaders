@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	SDL_Event event;
 	while (1)
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 			if (event.type == SDL_QUIT)
 				break;
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT + GL_DEPTH_BUFFER_BIT);
 
 		/*glUseProgram(compute_program);
 		{
