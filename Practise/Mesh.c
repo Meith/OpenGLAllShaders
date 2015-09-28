@@ -1,34 +1,7 @@
 #include "Mesh.h"
 
-#include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
-
-struct Mesh Mesh_Init(struct Vertex *vertices, GLuint vertex_count, GLuint *indices, GLuint index_count, struct Texture *textures, GLuint texture_count)
-{
-	struct Mesh mesh;
-	
-	mesh.vertices = (struct Vertex *)malloc(vertex_count * sizeof(struct Vertex));
-	GLuint i;
-	for (i = 0; i < vertex_count; ++i)
-		mesh.vertices[i] = vertices[i];
-
-	mesh.indices = (GLuint *)malloc(index_count * sizeof(GLuint));
-	for (i = 0; i < index_count; ++i)
-		mesh.indices[i] = indices[i];
-
-	mesh.textures = (struct Texture *)malloc(texture_count * sizeof(struct Texture));
-	for (i = 0; i < texture_count; ++i)
-		mesh.textures[i] = textures[i];
-
-	mesh.vertex_count = vertex_count;
-	mesh.index_count = index_count;
-	mesh.texture_count = texture_count;
-
-	Mesh_Setup(&mesh);
-
-	return mesh;
-}
 
 void Mesh_Setup(struct Mesh *mesh)
 {
@@ -77,13 +50,13 @@ void Mesh_Render(struct Mesh *mesh, GLuint shader_program)
 		GLchar name[25];
 		strcpy(name, mesh->textures[i].type);
 		GLchar number[3];
-		if (strcmp(name, "texture_diffuse"))
+		if (strcmp(name, "texture_diffuse") == 0)
 			sprintf(number, "%d", diffuse_no++);
-		else if (strcmp(name, "texture_specular"))
+		else if (strcmp(name, "texture_specular") == 0)
 			sprintf(number, "%d", specular_no++);
-		else if (strcmp(name, "texture_normal"))
+		else if (strcmp(name, "texture_normal") == 0)
 			sprintf(number, "%d", normal_no++);
-		else if (strcmp(name, "texture_height"))
+		else if (strcmp(name, "texture_height") == 0)
 			sprintf(number, "%d", height_no++);
 		strcat(name, number);
 
