@@ -39,6 +39,7 @@ struct Mesh
 	GLuint vao;
 	GLuint vbo;
 	GLuint ebo;
+	GLuint ssbo;
 };
 
 struct Model

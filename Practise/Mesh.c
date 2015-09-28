@@ -8,12 +8,19 @@ void Mesh_Setup(struct Mesh *mesh)
 	glGenVertexArrays(1, &mesh->vao);
 	glGenBuffers(1, &mesh->vbo);
 	glGenBuffers(1, &mesh->ebo);
+	glGenBuffers(1, &mesh->ssbo);
 
 	glBindVertexArray(mesh->vao);
 	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh->ssbo);
+		{
+			glBufferData(GL_ARRAY_BUFFER, mesh->vertex_count * sizeof(struct Vertex), mesh->vertices->position, GL_DYNAMIC_DRAW);
+		}
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 		{
-			glBufferData(GL_ARRAY_BUFFER, mesh->vertex_count * sizeof(struct Vertex), mesh->vertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, mesh->vertex_count * sizeof(struct Vertex), mesh->vertices, GL_DYNAMIC_DRAW);
 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(struct Vertex), (GLvoid *)offsetof(struct Vertex, position));
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(struct Vertex), (GLvoid *)offsetof(struct Vertex, normal));
@@ -28,9 +35,11 @@ void Mesh_Setup(struct Mesh *mesh)
 			glEnableVertexAttribArray(4);
 		}
 
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, mesh->ssbo);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
 		{
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index_count * sizeof(GLuint), mesh->indices, GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index_count * sizeof(GLuint), mesh->indices, GL_DYNAMIC_DRAW);
 		}
 	}
 	glBindVertexArray(0);
