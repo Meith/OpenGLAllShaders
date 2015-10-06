@@ -8,6 +8,7 @@
 
 #include "Types.h"
 #include "Shaders.h"
+#include "Camera.h"
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -44,6 +45,17 @@ int main(int argc, char *argv[])
 		[3].shader_source = "Shaders/geometry_shader.glsl", [3].shader_type = GL_GEOMETRY_SHADER,
 		[4].shader_source = "Shaders/fragment_shader.glsl", [4].shader_type = GL_FRAGMENT_SHADER };
 	GLuint render_program = Shaders_CreateShaderProgram(&render_pairs[0], 5);
+
+	struct Camera camera = { .eye = { 0.0f, 0.0f, 2.0f }, .target = { 0.0f, 0.0f, 0.0f }, .up = { 0.0f, 1.0f, 0.0f } };
+	mat4x4 view_matrix;
+	Camera_CreateViewMatrix(&camera, view_matrix);
+
+	GLfloat fanf[4] = { 0.785398f, 1.333333f, 0.1f, 100.0f };
+	mat4x4 perpective_matrix;
+	Camera_CreatePerspectiveMatrix(fanf, perpective_matrix);
+
+	mat4x4 pv;
+	mat4x4_mul(pv, perpective_matrix, view_matrix);
 
 	struct Vertex *tri_vertices = (struct Vertex *)malloc(NUM_VERTICES * sizeof(struct Vertex));
 
@@ -104,7 +116,10 @@ int main(int argc, char *argv[])
 	GLint tessinner_loc = glGetUniformLocation(render_program, "tess_inner");
 	GLint tessouter_loc = glGetUniformLocation(render_program, "tess_outer");
 
+	GLint pv_loc = glGetUniformLocation(render_program, "pv");
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_DEPTH_TEST);
 
 	GLfloat time;
 
@@ -115,7 +130,7 @@ int main(int argc, char *argv[])
 			if (event.type == SDL_QUIT)
 				break;
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(compute_program);
 		{
@@ -130,6 +145,8 @@ int main(int argc, char *argv[])
 		{
 			glUniform1f(tessinner_loc, 15);
 			glUniform1f(tessouter_loc, 15);
+
+			glUniformMatrix4fv(pv_loc, 1, GL_TRUE, pv);
 
 			glBindVertexArray(vao);
 			{
