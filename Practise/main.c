@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 	mat4x4 view_matrix;
 	Camera_CreateViewMatrix(&camera, view_matrix);
 
-	GLfloat fanf[4] = { 0.785398f, 1.333333f, 0.1f, 100.0f };
+	GLfloat fanf[4] = { 1.0472f, 1.333333f, 0.1f, 100.0f };
 	mat4x4 perpective_matrix;
 	Camera_CreatePerspectiveMatrix(fanf, perpective_matrix);
 
@@ -59,13 +59,9 @@ int main(int argc, char *argv[])
 
 	struct Vertex *tri_vertices = (struct Vertex *)malloc(NUM_VERTICES * sizeof(struct Vertex));
 
-	tri_vertices[0].position[0] = -1.0f; tri_vertices[0].position[1] = -0.5f; tri_vertices[0].position[2] = +0.0f; tri_vertices[0].position[3] = +1.0f;
-	tri_vertices[1].position[0] = +0.0f; tri_vertices[1].position[1] = -0.5f; tri_vertices[1].position[2] = +0.0f; tri_vertices[1].position[3] = +1.0f;
-	tri_vertices[2].position[0] = -0.5f; tri_vertices[2].position[1] = +0.5f; tri_vertices[2].position[2] = +0.0f; tri_vertices[2].position[3] = +1.0f;
-
-	tri_vertices[0].color[0] = +1.0f; tri_vertices[0].color[1] = +0.0f; tri_vertices[0].color[2] = +0.0f; tri_vertices[0].color[3] = +1.0f;
-	tri_vertices[1].color[0] = +0.0f; tri_vertices[1].color[1] = +1.0f; tri_vertices[1].color[2] = +0.0f; tri_vertices[1].color[3] = +1.0f;
-	tri_vertices[2].color[0] = +0.0f; tri_vertices[2].color[1] = +0.0f; tri_vertices[2].color[2] = +1.0f; tri_vertices[2].color[3] = +1.0f;
+	tri_vertices[0].position[0] = -1.0f; tri_vertices[0].position[1] = -1.0f; tri_vertices[0].position[2] = +0.0f; tri_vertices[0].position[3] = +1.0f;
+	tri_vertices[1].position[0] = +1.0f; tri_vertices[1].position[1] = -1.0f; tri_vertices[1].position[2] = +0.0f; tri_vertices[1].position[3] = +1.0f;
+	tri_vertices[2].position[0] = +0.0f; tri_vertices[2].position[1] = +1.0f; tri_vertices[2].position[2] = +0.0f; tri_vertices[2].position[3] = +1.0f;
 
 	GLushort *tri_indices = (GLushort *)malloc(NUM_INDICES * sizeof(GLushort));
 	tri_indices[0] = 0; tri_indices[1] = 1; tri_indices[2] = 2;
@@ -88,6 +84,12 @@ int main(int argc, char *argv[])
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	free(tri_indices);
 
+	GLuint tbo;
+	glGenTextures(1, &tbo);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tbo);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 256, 256);
+	glBindImageTexture(0, tbo, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -98,10 +100,6 @@ int main(int argc, char *argv[])
 			GLint vertex_loc = glGetAttribLocation(render_program, "vertex");
 			glVertexAttribPointer(vertex_loc, NUM_AXES, GL_FLOAT, GL_FALSE, sizeof(struct Vertex), (GLvoid *)offsetof(struct Vertex, position));
 			glEnableVertexAttribArray(vertex_loc);
-
-			GLint color_loc = glGetAttribLocation(render_program, "color");
-			glVertexAttribPointer(color_loc, NUM_AXES, GL_FLOAT, GL_FALSE, sizeof(struct Vertex), (GLvoid *)offsetof(struct Vertex, color));
-			glEnableVertexAttribArray(color_loc);
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vbo);
@@ -118,10 +116,13 @@ int main(int argc, char *argv[])
 
 	GLint pv_loc = glGetUniformLocation(render_program, "pv");
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 
 	GLfloat time;
+
+	GLfloat center[2] = { 0.001643721971153f, 0.822467633298876f };
+	GLfloat height = 2.0f;
 
 	SDL_Event event;
 	while (1)

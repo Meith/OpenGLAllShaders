@@ -8,7 +8,6 @@
 struct Vertex
 {
 	GLfloat position[NUM_AXES];
-	GLfloat color[NUM_AXES];
 };
 
 struct ShaderPair
