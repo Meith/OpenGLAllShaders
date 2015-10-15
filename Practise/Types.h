@@ -3,10 +3,51 @@
 
 #include "Vector.h"
 
+#include <SDL/SDL.h>
+#include <assimp/types.h>
+
+struct Window
+{
+	SDL_Window *gl_window;
+	SDL_GLContext gl_context;
+};
+
 struct Vertex
 {
-	vec4 position;
-	vec2 tex_coords;
+	vec3 position;
+	vec3 normal;
+	vec2 texcoords;
+	vec3 tangent;
+	vec3 bitangent;
+};
+
+struct Texture
+{
+	GLuint id;
+	GLchar type[25];
+	struct aiString path;
+};
+
+struct Mesh
+{
+	struct Vertex *vertices;
+	GLuint *indices;
+	struct Texture *textures;
+	GLuint vertex_count;
+	GLuint index_count;
+	GLuint texture_count;
+	GLuint vao;
+	GLuint vbo;
+	GLuint ebo;
+};
+
+struct Model
+{
+	struct Texture *textures_loaded;
+	GLuint textures_loaded_count;
+	struct Mesh *meshes;
+	GLuint mesh_count;
+	GLchar directory[50];
 };
 
 struct ShaderPair

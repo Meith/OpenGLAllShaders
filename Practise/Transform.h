@@ -6,7 +6,7 @@
 typedef struct Transform
 {
 	vec3 position;
-	quat quaternion;
+	vec4 quaternion;
 	vec3 scale;
 
 	mat4x4 world_matrix;

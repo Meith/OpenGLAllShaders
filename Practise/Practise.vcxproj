@@ -76,6 +76,7 @@
     <ClCompile Include="Model.c" />
     <ClCompile Include="Shaders.c" />
     <ClCompile Include="Transform.c" />
+    <ClCompile Include="Window.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\compute_shader.glsl" />
@@ -93,6 +94,7 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
