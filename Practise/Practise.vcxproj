@@ -51,7 +51,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -72,10 +72,12 @@
   <ItemGroup>
     <ClCompile Include="Camera.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Mesh.c" />
+    <ClCompile Include="Model.c" />
     <ClCompile Include="Shaders.c" />
+    <ClCompile Include="Transform.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="mandelbrot_cs.glsl" />
     <None Include="Shaders\compute_shader.glsl" />
     <None Include="Shaders\fragment_shader.glsl" />
     <None Include="Shaders\geometry_shader.glsl" />
@@ -85,7 +87,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="Shaders.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>

@@ -24,7 +24,16 @@
     <ClCompile Include="Shaders.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Model.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Camera.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,9 +56,6 @@
     <None Include="Shaders\tessellation_evaluation_shader.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="mandelbrot_cs.glsl">
-      <Filter>Shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Types.h">
@@ -58,10 +64,19 @@
     <ClInclude Include="Shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
