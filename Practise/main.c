@@ -39,6 +39,9 @@ int main(int argc, char *argv[])
 	struct ShaderPair compute_pair = { .shader_source = "Shaders/compute_shader.glsl", .shader_type = GL_COMPUTE_SHADER };
 	GLuint compute_program = Shaders_CreateShaderProgram(&compute_pair, 1);
 
+	struct ShaderPair mandelbort_cs_pair = { .shader_source = "Shaders/mandelbrot_cs.glsl", .shader_type = GL_COMPUTE_SHADER };
+	GLuint mandelbort_cs_program = Shaders_CreateShaderProgram(&mandelbort_cs_pair, 1);
+
 	struct ShaderPair render_pairs[5] = { [0].shader_source = "Shaders/vertex_shader.glsl", [0].shader_type = GL_VERTEX_SHADER,
 		[1].shader_source = "Shaders/tessellation_control_shader.glsl", [1].shader_type = GL_TESS_CONTROL_SHADER,
 		[2].shader_source = "Shaders/tessellation_evaluation_shader.glsl", [2].shader_type = GL_TESS_EVALUATION_SHADER,
@@ -59,9 +62,9 @@ int main(int argc, char *argv[])
 
 	struct Vertex *tri_vertices = (struct Vertex *)malloc(NUM_VERTICES * sizeof(struct Vertex));
 
-	tri_vertices[0].position[0] = -1.0f; tri_vertices[0].position[1] = -1.0f; tri_vertices[0].position[2] = +0.0f; tri_vertices[0].position[3] = +1.0f;
-	tri_vertices[1].position[0] = +1.0f; tri_vertices[1].position[1] = -1.0f; tri_vertices[1].position[2] = +0.0f; tri_vertices[1].position[3] = +1.0f;
-	tri_vertices[2].position[0] = +0.0f; tri_vertices[2].position[1] = +1.0f; tri_vertices[2].position[2] = +0.0f; tri_vertices[2].position[3] = +1.0f;
+	tri_vertices[0].position[0] = -1.0f; tri_vertices[0].position[1] = -1.0f; tri_vertices[0].position[2] = +0.0f; tri_vertices[0].position[3] = +1.0f; tri_vertices[0].tex_coords[0] = 0.0f; tri_vertices[0].tex_coords[1] = 0.0f;
+	tri_vertices[1].position[0] = +1.0f; tri_vertices[1].position[1] = -1.0f; tri_vertices[1].position[2] = +0.0f; tri_vertices[1].position[3] = +1.0f; tri_vertices[1].tex_coords[0] = 1.0f; tri_vertices[1].tex_coords[1] = 0.0f;
+	tri_vertices[2].position[0] = +0.0f; tri_vertices[2].position[1] = +1.0f; tri_vertices[2].position[2] = +0.0f; tri_vertices[2].position[3] = +1.0f; tri_vertices[2].tex_coords[0] = 0.5f; tri_vertices[2].tex_coords[1] = 1.0f;
 
 	GLushort *tri_indices = (GLushort *)malloc(NUM_INDICES * sizeof(GLushort));
 	tri_indices[0] = 0; tri_indices[1] = 1; tri_indices[2] = 2;
@@ -97,9 +100,11 @@ int main(int argc, char *argv[])
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		{
-			GLint vertex_loc = glGetAttribLocation(render_program, "vertex");
-			glVertexAttribPointer(vertex_loc, NUM_AXES, GL_FLOAT, GL_FALSE, sizeof(struct Vertex), (GLvoid *)offsetof(struct Vertex, position));
-			glEnableVertexAttribArray(vertex_loc);
+			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(struct Vertex), (GLvoid *)offsetof(struct Vertex, position));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(struct Vertex), (GLvoid *)offsetof(struct Vertex, tex_coords));
+
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vbo);
@@ -119,10 +124,17 @@ int main(int argc, char *argv[])
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 
-	GLfloat time;
-
+	//GLfloat time;
 	GLfloat center[2] = { 0.001643721971153f, 0.822467633298876f };
-	GLfloat height = 2.0f;
+	GLfloat cheight = 2.0f;
+	GLfloat cwidth = cheight;
+	vec4 bbox = { center[0] - cwidth / 2.0f, center[1] - cheight / 2.0f, center[0] + cwidth / 2.0f, center[1] + cheight / 2.0f };
+
+	glUseProgram(mandelbort_cs_program);
+	{
+		glUniform4fv(glGetUniformLocation(mandelbort_cs_program, "CompWindow"), 1, &bbox[0]);
+	}
+	glUseProgram(0);
 
 	SDL_Event event;
 	while (1)
@@ -133,14 +145,21 @@ int main(int argc, char *argv[])
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(compute_program);
+		glUseProgram(mandelbort_cs_program);
+		{
+			glDispatchCompute(256 / 32, 256 / 32, 1);
+			glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		}
+		glUseProgram(0);
+
+		/*glUseProgram(compute_program);
 		{
 			time = SDL_GetTicks() / 1000.0f;
 			glUniform1f(time_loc, time);
 			glDispatchCompute(3, 1, 1);
 			glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 		}
-		glUseProgram(0);
+		glUseProgram(0);*/
 
 		glUseProgram(render_program);
 		{
@@ -162,6 +181,7 @@ int main(int argc, char *argv[])
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+	glDeleteBuffers(1, &tbo);
 	glDeleteBuffers(1, &ebo);
 	glDeleteBuffers(1, &vbo);
 	glDeleteVertexArrays(1, &vao);

@@ -75,6 +75,7 @@
     <ClCompile Include="Shaders.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="mandelbrot_cs.glsl" />
     <None Include="Shaders\compute_shader.glsl" />
     <None Include="Shaders\fragment_shader.glsl" />
     <None Include="Shaders\geometry_shader.glsl" />

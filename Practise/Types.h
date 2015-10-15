@@ -3,11 +3,10 @@
 
 #include "Vector.h"
 
-#define NUM_AXES 4
-
 struct Vertex
 {
-	GLfloat position[NUM_AXES];
+	vec4 position;
+	vec2 tex_coords;
 };
 
 struct ShaderPair

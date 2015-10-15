@@ -52,11 +52,11 @@ GLuint Shaders_CreateShaderProgram(struct ShaderPair *shader_pair, GLint num_sha
 
 	GLint status;
 	glGetProgramiv(shader_program, GL_LINK_STATUS, &status);
-	printf("Compute Shader link status %d\n", status);
+	printf("Shader link status %d\n", status);
 
 	GLchar error_log[512];
 	glGetProgramInfoLog(shader_program, 512, NULL, error_log);
-	printf("Compute Program error log: %s\n", error_log);
+	printf("Program error log: %s\n", error_log);
 
 	for (i = 0; i < num_shaders; ++i)
 		glDeleteShader(shaders[i]);

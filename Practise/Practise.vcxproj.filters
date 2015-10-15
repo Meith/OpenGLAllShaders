@@ -47,6 +47,9 @@
     <None Include="Shaders\tessellation_evaluation_shader.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="mandelbrot_cs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Types.h">
