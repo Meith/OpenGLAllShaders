@@ -5,8 +5,9 @@
 
 #include <stdlib.h>
 
-extern struct Input *input = NULL;
+extern struct Input *input;
 
+void InputHandler_Init();
 GLuint InputHandler_Update();
 void InputHandler_OnKeyPress();
 void InputHandler_OnKeyRelease();

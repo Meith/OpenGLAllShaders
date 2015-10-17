@@ -1,5 +1,10 @@
 #include "InputHandler.h"
 
+void InputHandler_Init()
+{
+	input->keyboard_state = SDL_GetKeyboardState(0);
+	input->mouse_button_state[0] = input->mouse_button_state[1] = input->mouse_button_state[2] = 0;
+}
 
 GLuint InputHandler_Update()
 {

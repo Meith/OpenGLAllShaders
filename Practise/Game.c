@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+struct Input *input = NULL;
+
 void Game_Init()
 {
 	input = (struct Input *)malloc(sizeof(struct Input));
+	InputHandler_Init();
 }
 
 GLuint Game_HandleInput()
