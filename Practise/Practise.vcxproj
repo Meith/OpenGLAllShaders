@@ -71,6 +71,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.c" />
+    <ClCompile Include="Game.c" />
+    <ClCompile Include="InputHandler.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Mesh.c" />
     <ClCompile Include="Model.c" />
@@ -88,6 +90,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Shaders.h" />

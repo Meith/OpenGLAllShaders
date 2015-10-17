@@ -10,6 +10,24 @@ struct Window
 {
 	SDL_Window *gl_window;
 	SDL_GLContext gl_context;
+	GLuint width;
+	GLuint height;
+	GLenum flags;
+};
+
+enum MouseButtons
+{
+	LEFT = 0,
+	MIDDLE = 1,
+	RIGHT = 2
+};
+
+struct Input
+{
+	GLuint mouse_button_state[3];
+	vec2 mouse_pos;
+	Uint8 const *keyboard_state;
+	SDL_Event sdl_event;
 };
 
 struct Vertex
@@ -48,6 +66,7 @@ struct Model
 	struct Mesh *meshes;
 	GLuint mesh_count;
 	GLchar directory[50];
+	GLuint shader_program;
 };
 
 struct ShaderPair
