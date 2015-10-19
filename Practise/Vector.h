@@ -20,8 +20,8 @@ static _inline GLfloat vec##n##_dotprod(vec##n const a, vec##n const b) \
 { \
 	GLfloat l = 0.0f; \
 	GLuint i; \
-	for(i=0; i<n; ++i) \
-		l += b[i]*a[i]; \
+	for(i = 0; i < n; ++i) \
+		l += a[i] * b[i]; \
 	return l; \
 } \
 static _inline GLfloat vec##n##_len(vec##n const a) \
@@ -30,13 +30,14 @@ static _inline GLfloat vec##n##_len(vec##n const a) \
 } \
 static _inline void vec##n##_norm(vec##n r, vec##n const a) \
 { \
-	float b = 1.0 / vec##n##_len(a); \
+	float b = 1.0f / vec##n##_len(a); \
 	vec_scl_operation(r, a, b, n, *); \
 }
 
 vec(2)
 vec(3)
 vec(4)
+vec(16)
 
 static _inline void vec3_crossprod(vec3 r, vec3 const a, vec3 const b)
 {
@@ -45,22 +46,15 @@ static _inline void vec3_crossprod(vec3 r, vec3 const a, vec3 const b)
 	r[2] = a[0] * b[1] - a[1] * b[0];
 }
 
-typedef vec4 mat4x4[4];
+typedef vec16 mat4x4;
 
 static _inline void mat4x4_mul(mat4x4 r, mat4x4 a, mat4x4 b)
 {
-	GLuint i, j, k;
-	GLfloat sum = 0.0f;
+	GLuint i, j;
 
-	for (i = 0; i < 4; ++i)
+	for (i = 0; i < 4; i += 4)
 		for (j = 0; j < 4; ++j)
-		{
-			for (k = 0; k < 4; ++k)
-				sum += a[i][k] * b[k][j];
-
-			r[i][j] = sum;
-			sum = 0.0f;
-		}
+			r[i + j] = a[i] * b[j] + a[i + 1] * b[j + 4] + a[i + 2] * b[j + 8] + a[i + 3] * b[j + 12];
 }
 
 #endif

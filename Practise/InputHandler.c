@@ -1,7 +1,11 @@
 #include "InputHandler.h"
 
+struct Input *input = NULL;
+
 void InputHandler_Init()
 {
+	input = (struct Input *)malloc(sizeof(struct Input));
+
 	input->keyboard_state = SDL_GetKeyboardState(0);
 	input->mouse_button_state[0] = input->mouse_button_state[1] = input->mouse_button_state[2] = 0;
 }
