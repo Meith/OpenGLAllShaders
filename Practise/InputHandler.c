@@ -74,3 +74,8 @@ GLuint InputHandler_IsKeyPressed(SDL_Scancode key)
 {
 	return input->keyboard_state[key];
 }
+
+void InputHandler_Destroy()
+{
+	free(input);
+}

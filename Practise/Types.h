@@ -15,19 +15,32 @@ struct Window
 	GLenum flags;
 };
 
-enum MouseButtons
-{
-	LEFT = 0,
-	MIDDLE = 1,
-	RIGHT = 2
-};
-
 struct Input
 {
 	GLuint mouse_button_state[3];
 	vec2 mouse_pos;
 	Uint8 const *keyboard_state;
 	SDL_Event sdl_event;
+};
+
+struct ShaderPair
+{
+	GLchar const *shader_source;
+	GLenum shader_type;
+};
+
+struct Transform
+{
+	vec3 trans;
+	vec4 rot;
+	vec3 scale;
+};
+
+struct Camera
+{
+	vec3 eye;
+	vec3 target;
+	vec3 up;
 };
 
 struct Vertex
@@ -67,26 +80,6 @@ struct Model
 	GLuint mesh_count;
 	GLchar directory[50];
 	GLuint shader_program;
-};
-
-struct ShaderPair
-{
-	GLchar const *shader_source;
-	GLenum shader_type;
-};
-
-struct Transform
-{
-	vec3 trans;
-	vec4 rot;
-	vec3 scale;
-};
-
-struct Camera
-{
-	vec3 eye;
-	vec3 target;
-	vec3 up;
 };
 
 #endif

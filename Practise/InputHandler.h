@@ -12,5 +12,6 @@ GLuint InputHandler_Update();
 void InputHandler_OnKeyPress();
 void InputHandler_OnKeyRelease();
 GLuint InputHandler_IsKeyPressed(SDL_Scancode key);
+void InputHandler_Destroy();
 
 #endif
