@@ -2,14 +2,12 @@
 
 #include <stdlib.h>
 
-#define MAX_TRANSFORMS 10
-
 static struct Transform *transform_list = NULL;
 static GLuint num_transforms;
 
-void Transform_Init()
+void Transform_Init(max_trans)
 {
-	transform_list = (struct Transform *)malloc(MAX_TRANSFORMS * sizeof(struct Transform));
+	transform_list = (struct Transform *)malloc(max_trans * sizeof(struct Transform));
 	num_transforms = 0;
 }
 
@@ -21,7 +19,7 @@ GLuint Transform_Add(vec3 pos, vec3 rot, vec3 scale)
 	GLuint i;
 	for (i = 0; i < 3; ++i)
 	{
-		transform_list[num_transforms].trans[i] = pos[i];
+		transform_list[num_transforms].pos[i] = pos[i];
 		transform_list[num_transforms].rot[i] = q_rot[i];
 		transform_list[num_transforms].scale[i] = scale[i];
 	}
@@ -43,9 +41,9 @@ void Transform_Update()
 void Transform_GetModelMatrix(GLuint id)
 {
 	mat4x4 trans_matrix = {
-		1.0f, 0.0f, 0.0f, transform_list[id].trans[0],
-		0.0f, 1.0f, 0.0f, transform_list[id].trans[1],
-		0.0f, 0.0f, 1.0f, transform_list[id].trans[2],
+		1.0f, 0.0f, 0.0f, transform_list[id].pos[0],
+		0.0f, 1.0f, 0.0f, transform_list[id].pos[1],
+		0.0f, 0.0f, 1.0f, transform_list[id].pos[2],
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
 

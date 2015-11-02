@@ -3,7 +3,7 @@
 
 #include "Types.h"
 
-void Shaders_Init();
+void Shaders_Init(GLuint max_shaders);
 GLuint Shaders_CreateShaderProgram(struct ShaderPair *shader_pair, GLint num_shaders);
 GLuint Shaders_CreateShader(GLchar const *shader_source, GLenum shader_type);
 void Shaders_UseProgram(GLuint id);

@@ -5,7 +5,7 @@
 
 #include <assimp/scene.h>
 
-void Model_Init(GLuint num);
+void Model_Init(GLuint num_mods);
 struct Model Model_Load(GLchar const *model_source);
 void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene const *scene);
 void Model_ProcessMesh(struct Model *model, struct aiMesh *ai_mesh, struct aiScene const *scene);

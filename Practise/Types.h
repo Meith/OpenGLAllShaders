@@ -31,7 +31,7 @@ struct ShaderPair
 
 struct Transform
 {
-	vec3 trans;
+	vec3 pos;
 	vec4 rot;
 	vec3 scale;
 	mat4x4 model_matrix;
@@ -57,19 +57,19 @@ struct Vertex
 
 struct Texture
 {
-	GLuint id;
+	GLuint tbo;
 	GLchar type[25];
 	struct aiString path;
 };
 
 struct Mesh
 {
-	struct Vertex *vertices;
-	GLuint *indices;
 	struct Texture *textures;
+	GLuint texture_count;
+
 	GLuint vertex_count;
 	GLuint index_count;
-	GLuint texture_count;
+
 	GLuint vao;
 	GLuint vbo;
 	GLuint ebo;
@@ -79,10 +79,10 @@ struct Model
 {
 	struct Texture *textures_loaded;
 	GLuint textures_loaded_count;
+	GLchar directory[50];
+
 	struct Mesh *meshes;
 	GLuint mesh_count;
-	GLchar directory[50];
-	GLuint shader_program;
 };
 
 #endif

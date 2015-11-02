@@ -3,14 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_SHADERS 10
-
 static GLuint *shaders_prog_list = NULL;
 static GLuint num_shader_progs;
 
-void Shaders_Init()
+void Shaders_Init(GLuint max_shaders)
 {
-	shaders_prog_list = (GLuint *)malloc(MAX_SHADERS * sizeof(GLuint));
+	shaders_prog_list = (GLuint *)malloc(max_shaders * sizeof(GLuint));
 	num_shader_progs = 0;
 }
 

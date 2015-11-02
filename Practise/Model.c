@@ -8,9 +8,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-void Model_Init(GLuint num)
+static struct Model *model_list = NULL;
+static num_models;
+
+void Model_Init(num_mods)
 {
-	
+	model_list = (struct Model *)malloc(num_mods * sizeof(struct Model));
+	num_models = 0;
 }
 
 struct Model Model_Load(GLchar const *model_source)

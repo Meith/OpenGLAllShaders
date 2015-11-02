@@ -3,14 +3,12 @@
 
 #include <stdlib.h>
 
-#define MAX_CAMERAS 10
-
 static struct Camera *camera_list = NULL;
 static GLuint num_cameras;
 
-void Camera_Init()
+void Camera_Init(GLuint max_cams)
 {
-	camera_list = (struct Camera *)malloc(MAX_CAMERAS * sizeof(struct Camera));
+	camera_list = (struct Camera *)malloc(max_cams * sizeof(struct Camera));
 	num_cameras = 0;
 }
 

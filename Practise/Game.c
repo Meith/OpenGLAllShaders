@@ -5,14 +5,19 @@
 #include "Camera.h"
 #include "Model.h"
 
-#include <stdio.h>
+#define MAX_SHADERS 1
+#define MAX_TRANSFORMS 1
+#define MAX_CAMERAS 1
+#define MAX_MODELS 1
 
 void Game_Init()
 {
 	InputHandler_Init();
-	Transform_Init();
-	Camera_Init();
-	Shaders_Init();
+
+	Shaders_Init(MAX_SHADERS);
+	Transform_Init(MAX_TRANSFORMS);
+
+	Camera_Init(MAX_CAMERAS);
 }
 
 GLuint Game_HandleInput()
@@ -43,7 +48,9 @@ void Game_Render()
 void Game_Destroy()
 {
 	InputHandler_Destroy();
+
+	Shaders_Destroy();
 	Transform_Destroy();
 	Camera_Destroy();
-	Shaders_Destroy();
+	
 }
