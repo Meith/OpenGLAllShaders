@@ -3,6 +3,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_SHADERS 10
+
+static GLuint *shaders_prog_list = NULL;
+static GLuint num_shader_progs;
+
+void Shaders_Init()
+{
+	shaders_prog_list = (GLuint *)malloc(MAX_SHADERS * sizeof(GLuint));
+	num_shader_progs = 0;
+}
+
+GLuint Shaders_CreateShaderProgram(struct ShaderPair *shader_pair, GLint num_shaders)
+{
+	GLuint *shaders = (GLuint *)malloc(num_shaders * sizeof(GLuint));
+	int i;
+	for (i = 0; i < num_shaders; ++i)
+		shaders[i] = Shaders_CreateShader(shader_pair[i].shader_source, shader_pair[i].shader_type);
+
+	GLuint shader_program = glCreateProgram();
+	for (i = 0; i < num_shaders; ++i)
+		glAttachShader(shader_program, shaders[i]);
+	glLinkProgram(shader_program);
+
+	GLint status;
+	glGetProgramiv(shader_program, GL_LINK_STATUS, &status);
+	printf("Shader link status %d\n", status);
+
+	GLchar error_log[512];
+	glGetProgramInfoLog(shader_program, 512, NULL, error_log);
+	printf("Program error log: %s\n", error_log);
+
+	for (i = 0; i < num_shaders; ++i)
+		glDeleteShader(shaders[i]);
+	free(shaders);
+
+	shaders_prog_list[num_shader_progs] = shader_program;
+
+	return num_shader_progs++;
+}
+
 GLuint Shaders_CreateShader(GLchar const *shader_source, GLenum shader_type)
 {
 	FILE *fptr;
@@ -38,29 +78,17 @@ GLuint Shaders_CreateShader(GLchar const *shader_source, GLenum shader_type)
 	return shader;
 }
 
-GLuint Shaders_CreateShaderProgram(struct ShaderPair *shader_pair, GLint num_shaders)
+void Shaders_UseProgram(GLuint id)
 {
-	GLuint *shaders = (GLuint *)malloc(num_shaders * sizeof(GLuint));
-	int i;
-	for (i = 0; i < num_shaders; ++i)
-		shaders[i] = Shaders_CreateShader(shader_pair[i].shader_source, shader_pair[i].shader_type);
+	glUseProgram(shaders_prog_list[id]);
+}
 
-	GLuint shader_program = glCreateProgram();
-	for (i = 0; i < num_shaders; ++i)
-		glAttachShader(shader_program, shaders[i]);
-	glLinkProgram(shader_program);
+void Shaders_UnuseProgram()
+{
+	glUseProgram(0);
+}
 
-	GLint status;
-	glGetProgramiv(shader_program, GL_LINK_STATUS, &status);
-	printf("Shader link status %d\n", status);
-
-	GLchar error_log[512];
-	glGetProgramInfoLog(shader_program, 512, NULL, error_log);
-	printf("Program error log: %s\n", error_log);
-
-	for (i = 0; i < num_shaders; ++i)
-		glDeleteShader(shaders[i]);
-	free(shaders);
-
-	return shader_program;
+void Shaders_Destroy()
+{
+	free(shaders_prog_list);
 }

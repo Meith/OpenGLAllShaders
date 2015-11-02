@@ -34,13 +34,16 @@ struct Transform
 	vec3 trans;
 	vec4 rot;
 	vec3 scale;
+	mat4x4 model_matrix;
 };
 
 struct Camera
 {
 	vec3 eye;
-	vec3 target;
+	vec3 look;
 	vec3 up;
+	mat4x4 view_matrix;
+	mat4x4 perspective_matrix;
 };
 
 struct Vertex

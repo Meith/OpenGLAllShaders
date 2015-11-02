@@ -1,6 +1,6 @@
 #include "InputHandler.h"
 
-struct Input *input = NULL;
+static struct Input *input = NULL;
 
 void InputHandler_Init()
 {

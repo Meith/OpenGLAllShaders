@@ -5,7 +5,6 @@
 
 #include <math.h>
 #include <xmmintrin.h>
-#include <emmintrin.h>
 
 // operation within vector
 #define vec_in_operation(r, a, n, o) { GLuint i; for(i = 0; i < n; ++i) r = r o a[i]; }
@@ -45,6 +44,26 @@ static _inline void vec3_crossprod(vec3 r, vec3 const a, vec3 const b)
 	r[0] = a[1] * b[2] - a[2] * b[1];
 	r[1] = a[2] * b[0] - a[0] * b[2];
 	r[2] = a[0] * b[1] - a[1] * b[0];
+}
+
+static _inline void vec3_quat(vec4 r, vec3 const a)
+{
+	GLfloat half_pitch = a[0] / 2.0f;
+	GLfloat half_yaw = a[1] / 2.0f;
+	GLfloat half_roll = a[2] / 2.0f;
+
+	GLfloat cp = (GLfloat)cos(half_pitch);
+	GLfloat cy = (GLfloat)cos(half_yaw);
+	GLfloat cr = (GLfloat)cos(half_roll);
+
+	GLfloat sp = (GLfloat)sin(half_pitch);
+	GLfloat sy = (GLfloat)sin(half_yaw);
+	GLfloat sr = (GLfloat)sin(half_roll);
+
+	r[0] = (sp * cy * sr) + (cp * -sy * cr);
+	r[1] = (sp * -cy * cr) + (cp * -sy * sr);
+	r[2] = (sp * sy * cr) + (cp * -cy * sr);
+	r[3] = (cp * cy * cr) + (sp * sy * sr);
 }
 
 typedef GLfloat bivec4[6]; // xy xz xw yz yw zw

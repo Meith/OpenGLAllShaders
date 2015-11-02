@@ -2,18 +2,24 @@
 #include "Mesh.h"
 
 #include <assimp/postprocess.h>
+#include <assimp/cimport.h>
 #include <SOIL/SOIL.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-struct Model *Model_Load(GLchar const *model_source)
+void Model_Init(GLuint num)
 {
-	struct Model *model = (struct Model *)malloc(sizeof(struct Model));
-	model->mesh_count = 0;
-	model->meshes = NULL;
-	model->textures_loaded = NULL;
-	model->textures_loaded_count = 0;
+	
+}
+
+struct Model Model_Load(GLchar const *model_source)
+{
+	struct Model model;
+	model.mesh_count = 0;
+	model.meshes = NULL;
+	model.textures_loaded = NULL;
+	model.textures_loaded_count = 0;
 
 	struct aiScene const *scene = aiImportFile(model_source, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
@@ -21,10 +27,10 @@ struct Model *Model_Load(GLchar const *model_source)
 
 	GLuint i;
 	for (i = 0; model_source + i != directory_length; ++i)
-		model->directory[i] = model_source[i];
-	model->directory[i] = 0;
+		model.directory[i] = model_source[i];
+	model.directory[i] = 0;
 
-	Model_ProcessNode(model, scene->mRootNode, scene);
+	Model_ProcessNode(&model, scene->mRootNode, scene);
 
 	return model;
 }

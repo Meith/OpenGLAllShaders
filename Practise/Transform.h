@@ -3,6 +3,10 @@
 
 #include "Types.h"
 
-void Transform_GetModelMatrix(struct Transform *transform, mat4x4 model_matrix);
+void Transform_Init();
+GLuint Transform_Add(vec3 pos, vec3 rot, vec3 scale);
+void Transform_Update();
+void Transform_GetModelMatrix(GLuint id);
+void Transform_Destroy();
 
 #endif

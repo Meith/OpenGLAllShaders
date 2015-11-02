@@ -3,7 +3,11 @@
 
 #include "Types.h"
 
-void Camera_CreateViewMatrix(struct Camera *camera, mat4x4 view_matrix);
-void Camera_CreatePerspectiveMatrix(vec4 fanf, mat4x4 perspective_matrix);
+void Camera_Init();
+GLuint Camera_Add(vec3 eye, vec3 look, vec3 up, vec4 fanf);
+void Camera_Update();
+void Camera_CreateViewMatrix(GLuint id);
+void Camera_CreatePerspectiveMatrix(GLuint id, vec4 fanf);
+void Camera_Destroy();
 
 #endif
