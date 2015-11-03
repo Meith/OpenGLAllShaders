@@ -9,7 +9,7 @@
 #include <string.h>
 
 static struct Model *model_list = NULL;
-static num_models;
+static GLuint num_models;
 
 void Model_Init(num_mods)
 {
@@ -17,13 +17,12 @@ void Model_Init(num_mods)
 	num_models = 0;
 }
 
-struct Model Model_Load(GLchar const *model_source)
+GLuint Model_Add(GLchar const *model_source)
 {
-	struct Model model;
-	model.mesh_count = 0;
-	model.meshes = NULL;
-	model.textures_loaded = NULL;
-	model.textures_loaded_count = 0;
+	model_list[num_models].meshes = NULL;
+	model_list[num_models].mesh_count = 0;
+	model_list[num_models].textures_loaded = NULL;
+	model_list[num_models].textures_loaded_count = 0;
 
 	struct aiScene const *scene = aiImportFile(model_source, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
@@ -31,12 +30,12 @@ struct Model Model_Load(GLchar const *model_source)
 
 	GLuint i;
 	for (i = 0; model_source + i != directory_length; ++i)
-		model.directory[i] = model_source[i];
-	model.directory[i] = 0;
+		model_list[num_models].directory[i] = model_source[i];
+	model_list[num_models].directory[i] = 0;
 
-	Model_ProcessNode(&model, scene->mRootNode, scene);
+	Model_ProcessNode(&model_list[num_models], scene->mRootNode, scene);
 
-	return model;
+	return num_models++;
 }
 
 void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene const *scene)
@@ -156,7 +155,7 @@ void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, G
 
 		if (!skip)
 		{
-			textures[k].id = Model_TextureFromFile(string.data, model->directory, 0);
+			textures[k].tbo = Model_TextureFromFile(string.data, model->directory, 0);
 			strcpy(textures[k].type, type_name);
 			textures[k].path = string;
 			model->textures_loaded = (struct Texture *)realloc(model->textures_loaded, (model->textures_loaded_count + 1) * sizeof(struct Texture));
@@ -171,12 +170,12 @@ GLint Model_TextureFromFile(const GLchar* path, GLchar const *directory, GLboole
 	strcpy(filename, directory);
 	strcat(filename, path);
 
-	GLuint texture_id;
-	glGenTextures(1, &texture_id);
+	GLuint tbo;
+	glGenTextures(1, &tbo);
 	GLint width, height;
 	unsigned char *image = SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glBindTexture(GL_TEXTURE_2D, tbo);
 	glTexImage2D(GL_TEXTURE_2D, 0, gamma ? GL_SRGB : GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -186,14 +185,30 @@ GLint Model_TextureFromFile(const GLchar* path, GLchar const *directory, GLboole
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	SOIL_free_image_data(image);
-	return texture_id;
+	return tbo;
 }
 
-void Model_Render(struct Model *model, GLuint shader_prog)
+void Model_Render(GLuint id, GLuint shader_prog)
 {
 	GLuint i;
-	for (i = 0; i < model->mesh_count; ++i)
+	for (i = 0; i < model_list[id].mesh_count; ++i)
 	{
-		Mesh_Render(&model->meshes[i], shader_prog);
+		Mesh_Render(&model_list[id].meshes[i], shader_prog);
 	}
+}
+
+void Model_Destroy()
+{
+	GLuint i;
+	GLuint j;
+	for (i = 0; i < num_models; ++i)
+	{
+		for (j = 0; j < model_list[i].mesh_count; ++j)
+			Mesh_Destroy(&(model_list[i].meshes[j]));
+		
+		free(model_list[i].meshes);
+		free(model_list[i].textures_loaded);
+	}
+
+	free(model_list);
 }

@@ -67,7 +67,10 @@ struct Mesh
 	struct Texture *textures;
 	GLuint texture_count;
 
+	struct Vertex *vertices;
 	GLuint vertex_count;
+
+	GLuint *indices;
 	GLuint index_count;
 
 	GLuint vao;
@@ -83,6 +86,13 @@ struct Model
 
 	struct Mesh *meshes;
 	GLuint mesh_count;
+};
+
+struct GameObject
+{
+	GLuint shader_id;
+	GLuint model_id;
+	GLuint transform_id;
 };
 
 #endif

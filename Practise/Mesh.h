@@ -5,5 +5,6 @@
 
 void Mesh_Setup(struct Mesh *mesh);
 void Mesh_Render(struct Mesh *mesh, GLuint shader_program);
+void Mesh_Destroy(struct Mesh *mesh);
 
 #endif

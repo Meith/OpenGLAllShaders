@@ -61,7 +61,7 @@ void Mesh_Render(struct Mesh *mesh, GLuint shader_program)
 		strcat(name, number);
 
 		glUniform1i(glGetUniformLocation(shader_program, name), i);
-		glBindTexture(GL_TEXTURE_2D, mesh->textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, mesh->textures[i].tbo);
 	}
 
 	glBindVertexArray(mesh->vao);
@@ -75,4 +75,11 @@ void Mesh_Render(struct Mesh *mesh, GLuint shader_program)
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+void Mesh_Destroy(struct Mesh *mesh)
+{
+	free(mesh->vertices);
+	free(mesh->indices);
+	free(mesh->textures);
 }
