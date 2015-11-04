@@ -71,6 +71,11 @@ void Transform_GetModelMatrix(GLuint id)
 	mat4x4_mul(transform_list[id].model_matrix, temp_mat, scale_matrix);
 }
 
+void Transform_Render(GLuint id)
+{
+	glUniformMatrix4fv(2, 1, GL_FALSE, transform_list[id].model_matrix);
+}
+
 void Transform_Destroy()
 {
 	free(transform_list);

@@ -95,4 +95,9 @@ struct GameObject
 	GLuint transform_id;
 };
 
+struct CameraObject
+{
+	GLuint camera_id;
+};
+
 #endif

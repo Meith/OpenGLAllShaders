@@ -8,6 +8,7 @@ GLuint Camera_Add(vec3 eye, vec3 look, vec3 up, vec4 fanf);
 void Camera_Update();
 void Camera_CreateViewMatrix(GLuint id);
 void Camera_CreatePerspectiveMatrix(GLuint id, vec4 fanf);
+void Camera_Render(GLuint id);
 void Camera_Destroy();
 
 #endif

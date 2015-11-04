@@ -188,12 +188,12 @@ GLint Model_TextureFromFile(const GLchar* path, GLchar const *directory, GLboole
 	return tbo;
 }
 
-void Model_Render(GLuint id, GLuint shader_prog)
+void Model_Render(GLuint id)
 {
 	GLuint i;
 	for (i = 0; i < model_list[id].mesh_count; ++i)
 	{
-		Mesh_Render(&model_list[id].meshes[i], shader_prog);
+		Mesh_Render(&model_list[id].meshes[i]);
 	}
 }
 

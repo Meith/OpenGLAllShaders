@@ -11,7 +11,7 @@ void Model_ProcessNode(struct Model *model, struct aiNode *node, struct aiScene 
 void Model_ProcessMesh(struct Model *model, struct aiMesh *ai_mesh, struct aiScene const *scene);
 void Model_LoadMaterialTextures(struct Model *model, struct Texture *textures, GLuint start_index, GLuint end_index, struct aiMaterial *material, enum aiTextureType type, GLchar const *type_name);
 GLint Model_TextureFromFile(const GLchar* path, GLchar const *directory, GLboolean gamma);
-void Model_Render(GLuint id, GLuint shader_prog);
+void Model_Render(GLuint id);
 void Model_Destroy();
 
 #endif
