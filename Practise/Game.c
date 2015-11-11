@@ -30,7 +30,6 @@ void Game_Init()
 	camera_object_list = (struct CameraObject *)malloc(MAX_CAMERAS * sizeof(struct CameraObject));
 	num_objects = 0;
 	num_cams = 0;
-	/**/
 
 	struct ShaderPair simple_shader_pair[2] = { [0].shader_source = "Shaders/vertex_shader.glsl", [0].shader_type = GL_VERTEX_SHADER, [1].shader_source = "Shaders/fragment_shader.glsl", [1].shader_type = GL_FRAGMENT_SHADER };
 	GLuint simple_shader_id = Shaders_CreateShaderProgram(&simple_shader_pair[0], 2);
@@ -82,7 +81,7 @@ void Game_Render()
 	{
 		Camera_Render(camera_object_list[0].camera_id);
 		Transform_Render(game_object_list[0].transform_id);
-		Model_Render(game_object_list[0].model_id);
+		Model_Render(game_object_list[0].model_id, Shaders_GetProgram(game_object_list[0].shader_id));
 	}
 	Shaders_UnuseProgram();
 }

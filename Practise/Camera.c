@@ -94,8 +94,8 @@ void Camera_CreatePerspectiveMatrix(GLuint id, GLfloat fanf[4])
 
 void Camera_Render(GLuint id)
 {
-	glUniformMatrix4fv(0, 1, GL_FALSE, camera_list[id].perspective_matrix);
-	glUniformMatrix4fv(1, 1, GL_FALSE, camera_list[id].view_matrix);
+	glUniformMatrix4fv(0, 1, GL_TRUE, camera_list[id].perspective_matrix);
+	glUniformMatrix4fv(1, 1, GL_TRUE, camera_list[id].view_matrix);
 }
 
 void Camera_Destroy()

@@ -76,6 +76,11 @@ GLuint Shaders_CreateShader(GLchar const *shader_source, GLenum shader_type)
 	return shader;
 }
 
+GLuint Shaders_GetProgram(GLuint id)
+{
+	return shaders_prog_list[id];
+}
+
 void Shaders_UseProgram(GLuint id)
 {
 	glUseProgram(shaders_prog_list[id]);

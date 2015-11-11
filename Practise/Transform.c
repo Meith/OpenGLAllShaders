@@ -73,7 +73,7 @@ void Transform_GetModelMatrix(GLuint id)
 
 void Transform_Render(GLuint id)
 {
-	glUniformMatrix4fv(2, 1, GL_FALSE, transform_list[id].model_matrix);
+	glUniformMatrix4fv(2, 1, GL_TRUE, transform_list[id].model_matrix);
 }
 
 void Transform_Destroy()

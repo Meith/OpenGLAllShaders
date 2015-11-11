@@ -36,14 +36,14 @@ void Mesh_Setup(struct Mesh *mesh)
 	glBindVertexArray(0);
 }
 
-void Mesh_Render(struct Mesh *mesh)
+void Mesh_Render(struct Mesh *mesh, GLuint shader_program)
 {
 	GLuint diffuse_no = 1;
 	GLuint specular_no = 1;
 	GLuint normal_no = 1;
 	GLuint height_no = 1;
 	GLuint i;
-	/*for (i = 0; i < mesh->texture_count; ++i)
+	for (i = 0; i < mesh->texture_count; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		
@@ -60,13 +60,9 @@ void Mesh_Render(struct Mesh *mesh)
 			sprintf(number, "%d", height_no++);
 		strcat(name, number);
 
-		glUniform1i(3, i);
+		glUniform1i(glGetUniformLocation(shader_program, name), i);
 		glBindTexture(GL_TEXTURE_2D, mesh->textures[i].tbo);
-	}*/
-
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glUniform1i(3, 0);
-	glBindTexture(GL_TEXTURE_2D, mesh->textures[0].tbo);
+	}
 
 	glBindVertexArray(mesh->vao);
 	{
@@ -74,11 +70,11 @@ void Mesh_Render(struct Mesh *mesh)
 	}
 	glBindVertexArray(0);
 
-	/*for (i = 0; i < mesh->texture_count; ++i)
+	for (i = 0; i < mesh->texture_count; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
-	}*/
+	}
 }
 
 void Mesh_Destroy(struct Mesh *mesh)
