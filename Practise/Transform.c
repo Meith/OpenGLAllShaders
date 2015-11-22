@@ -51,10 +51,17 @@ void Transform_GetModelMatrix(GLuint id)
 	GLfloat qy =  transform_list[id].rot[1]; 
 	GLfloat qz =  transform_list[id].rot[2]; 
 	GLfloat qw =  transform_list[id].rot[3];
-	mat4x4 rot_matrix = {
+	/*mat4x4 rot_matrix = {
 		1.0f - 2.0f * (qy * qy + qz * qz), 2.0f * (qx * qy + qz * qw), 2.0f * (qx * qz - qy * qw), 0.0f,
 		2.0f * (qx * qy - qz * qw), 1.0f - 2.0f * (qx * qx + qz * qz), 2.0f * (qy * qz + qx * qw), 0.0f,
 		2.0f * (qx * qz + qy * qw), 2.0f * (qy * qz - qx * qw), 1.0f - 2.0f * (qx * qx + qy * qy), 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};*/
+
+	mat4x4 rot_matrix = {
+		1.0f - 2.0f * (qy * qy + qz * qz), 2.0f * (qx * qy - qz * qw), 2.0f * (qx * qz + qy * qw), 0.0f,
+		2.0f * (qx * qy + qz * qw), 1.0f - 2.0f * (qx * qx + qz * qz), 2.0f * (qy * qz - qx * qw), 0.0f,
+		2.0f * (qx * qz - qy * qw), 2.0f * (qy * qz + qx * qw), 1.0f - 2.0f * (qx * qx + qy * qy), 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
 

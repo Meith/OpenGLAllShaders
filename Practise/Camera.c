@@ -44,9 +44,9 @@ void Camera_CreateViewMatrix(GLuint id)
 	z[1] = camera_list[id].look[1];
 	z[2] = camera_list[id].look[2];
 
-	vec3_crossprod(x, z, camera_list[id].up);
+	vec3_crossprod(x, camera_list[id].up, z);
 
-	vec3_crossprod(y, x, z);
+	vec3_crossprod(y, z, x);
 
 	camera_list[id].view_matrix[0] = x[0]; camera_list[id].view_matrix[1] = x[1]; camera_list[id].view_matrix[2] = x[2];
 	camera_list[id].view_matrix[4] = y[0]; camera_list[id].view_matrix[5] = y[1]; camera_list[id].view_matrix[6] = y[2];

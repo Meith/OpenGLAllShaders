@@ -60,10 +60,10 @@ static _inline void vec3_quat(vec4 r, vec3 const a)
 	GLfloat sy = (GLfloat)sin(half_yaw);
 	GLfloat sr = (GLfloat)sin(half_roll);
 
-	r[0] = (sp * cy * sr) + (cp * -sy * cr);
-	r[1] = (sp * -cy * cr) + (cp * -sy * sr);
-	r[2] = (sp * sy * cr) + (cp * -cy * sr);
-	r[3] = (cp * cy * cr) + (sp * sy * sr);
+	r[0] = (cp * sy * sr) + (sp * cy * cr);
+	r[1] = (cp * sy * cr) + (sp * cy * sr);
+	r[2] = (cp * cy * sr) - (sp * sy * cr);
+	r[3] = (cp * cy * cr) - (sp * sy * sr);
 }
 
 typedef GLfloat bivec4[6]; // xy xz xw yz yw zw

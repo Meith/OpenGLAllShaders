@@ -36,7 +36,7 @@ void Game_Init()
 
 	GLuint simple_model_id = Model_Add("Objects/Nanosuit/nanosuit.obj");
 
-	vec3 pos = { 0.0f, 0.0f, 0.0f };
+	vec3 pos = { 0.0f, -7.5f, 0.0f };
 	vec3 rot = { 0.0f, 0.0f, 0.0f };
 	vec3 scale = { 1.0f, 1.0f, 1.0f };
 	GLuint simple_transform_id = Transform_Add(pos, rot, scale);
@@ -46,8 +46,8 @@ void Game_Init()
 	game_object_list[num_objects].transform_id = simple_transform_id;
 	num_objects++;
 
-	vec3 eye = { 0.0f, 0.0f, 10.0f };
-	vec3 look = { 0.0f, 0.0f, -1.0f };
+	vec3 eye = { 0.0f, 0.0f, 20.0f };
+	vec3 look = { 0.0f, 0.0f, 1.0f };
 	vec3 up = { 0.0f, 1.0f, 0.0f };
 	vec4 fanf = { 0.785398f, 1.333333f, 0.1f, 100.0f };
 	GLuint simple_camera_id = Camera_Add(eye, look, up, fanf);
@@ -93,6 +93,7 @@ void Game_Destroy()
 	Shaders_Destroy();
 	Transform_Destroy();
 	Camera_Destroy();
+	Model_Destroy();
 
 	free(game_object_list);
 	free(camera_object_list);
