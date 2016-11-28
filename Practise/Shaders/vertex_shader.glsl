@@ -1,12 +1,11 @@
 #version 440 core
 
-in vec4 vertex;
-in vec4 color;
+in vec3 vertex;
 
-out vec4 vs_color;
+uniform mat4 view_mat;
+uniform mat4 persp_mat;
 
 void main()
 {
-	gl_Position = vertex;
-	vs_color = color;
+	gl_Position = persp_mat * view_mat * vec4(vertex, 1.0);
 }
